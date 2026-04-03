@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Werewolf GM v5.58 (Mobile Savior)</title>
+<title>Werewolf GM v5.60 (Final Goodnight)</title>
 
 <style>
 :root {
@@ -87,7 +87,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 #gameLog { font-size: 13px; color: #94a3b8; padding: 15px; height: 150px; overflow-y: auto; background: rgba(0,0,0,0.4); border-radius: 22px; border: 1px solid var(--glass-border); line-height: 1.6; margin-top: 20px; }
 .log-header { color: var(--warning); font-weight: bold; border-bottom: 1px solid rgba(251, 191, 36, 0.2); margin-top: 10px; padding-bottom: 5px; }
 
-/* ⏱️ Timer & Modals (FIXED: เปลี่ยนเป็น Display None/Flex แทน Opacity เพื่อแก้บั๊กมือถือ) */
+/* ⏱️ Timer & Modals */
 #fullScreenTimer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(10px); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
 #fullScreenTimer.active { display: flex; }
 #massiveTimerDisplay { font-size: clamp(70px, 20vw, 130px); font-weight: bold; color: white; margin: 20px 0; font-variant-numeric: tabular-nums; line-height: 1; }
@@ -112,7 +112,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   <div id="groupScreen" class="screen">
     <div class="glass-panel" style="text-align:center;">
       <h1 style="margin:0; font-size: 32px; letter-spacing: 2px;">WEREWOLF</h1>
-      <p style="color:var(--warning); margin-bottom: 20px;">Game Manager v5.58</p>
+      <p style="color:var(--warning); margin-bottom: 20px;">Game Manager v5.60</p>
       <div style="display:flex; gap:10px;"><input id="groupName" placeholder="ชื่อกลุ่มเล่น..."><button class="primary" onclick="createGroup()">สร้าง</button></div>
       <button class="ghost" style="width:100%; margin-top:10px;" onclick="createTestGroup()">สร้างห้องทดสอบ</button>
     </div>
@@ -337,7 +337,7 @@ function getRandomWinMessage(type) {
 
 // ================= ⚙️ Core Variables ================= //
 let groups=[], currentGroup=null, players=[];
-let nightKillTargets=[], nightGuardTarget=null, lastGuardTarget=null, elderSilenceTarget=null, cultRecruits=[], lovers=[], wolfBuff=false, gameLogs=[], thugTargets = [], hellHoundPartner = null, lastKilledByVote = null, isPrivacyMode = false;
+let nightKillTargets=[], nightGuardTarget=null, lastGuardTarget=null, elderSilenceTarget=null, cultRecruits=[], lovers=[], wolfBuff=false, wolfBuffUsed=false, gameLogs=[], thugTargets = [], hellHoundPartner = null, lastKilledByVote = null, isPrivacyMode = false;
 let dayCount = 0, minionCheckDone = false, witchUsed = false, witchAction = null, witchPoisonTarget = null, nightStep = 0;
 let timerInterval = null, timeRemaining = 0, nominatedPlayer = null;
 let deadThisNight = [], silencedThisNight = [], secretLogs = [], deadThisVote = [];
@@ -444,7 +444,7 @@ function startGame(){
     if(players.length < 3){ alert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
     
     players.forEach(p => { p.alive = true; p.toughGuyBleeding = false; p.silenced = false; p.isCult = (p.role === 'cult_leader'); });
-    lovers = []; lastGuardTarget = null; gameLogs = []; wolfBuff = false; thugTargets = []; hellHoundPartner = null; lastKilledByVote = null; dayCount = 1; minionCheckDone = false; witchUsed = false;
+    lovers = []; lastGuardTarget = null; gameLogs = []; wolfBuff = false; wolfBuffUsed = false; thugTargets = []; hellHoundPartner = null; lastKilledByVote = null; dayCount = 1; minionCheckDone = false; witchUsed = false;
     
     addLog("--- เริ่มต้นเกม ---"); 
     addLog(`เช้าวันที่ ${dayCount}`, true);
@@ -542,9 +542,8 @@ function renderHellHoundSelect(){
         </div>`;
 }
 
-// ================= ⏱️ Timer Logic (FIXED) ================= //
+// ================= ⏱️ Timer Logic ================= //
 function startCustomTimer() {
-    // บังคับให้คีย์บอร์ดมือถือพับลงก่อนแสดง Popup
     if(document.activeElement) document.activeElement.blur();
 
     const minVal = document.getElementById('timerMins').value;
@@ -559,15 +558,12 @@ function startCustomTimer() {
     }
     
     if(!isPrivacyMode) togglePrivacy(); 
-    
-    // เปลี่ยนมาใช้ CSS Display: Flex เพื่อให้มือถือ Mount UI ได้ 100%
     document.getElementById('fullScreenTimer').classList.add('active');
     
     clearInterval(timerInterval); 
     timeRemaining = t;
     updateTimerDisp();
     
-    // ปลุกระบบเสียงใน iOS ให้พร้อมใช้งาน
     try { alarmAudio.play().then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; }).catch(e => {}); } catch(e){}
     
     timerInterval = setInterval(() => { 
@@ -622,9 +618,9 @@ function verdict(isGuilty) {
     }
     
     deadThisVote = [players[i].name]; 
-    if(players[i].role === 'wolf_cub') wolfBuff = true;
-    
     players[i].alive = false; 
+    if(players[i].role === 'wolf_cub') wolfBuff = true; 
+    
     lastKilledByVote = i; 
     addLog(`${players[i].name} ถูกลงทัณฑ์แขวนคอ`);
     
@@ -689,6 +685,7 @@ function renderNightRole(type) {
     }
     
     if(type === "wolf" && wolfBuff) {
+        wolfBuffUsed = true;
         html += `<div style="color:var(--danger); text-align:center; font-size:18px; margin-bottom:15px; font-weight:bold;">⚠️ ความโกรธแค้น! คืนนี้หมาป่าสามารถเลือกสังหารได้ 2 คน</div>`;
     }
     
@@ -697,7 +694,8 @@ function renderNightRole(type) {
     html += players.map((p, i) => {
         if(!p.alive && type !== "witch") return "";
         let btn = "", sel = false;
-        const nameClass = lovers.includes(i) ? "lover-name" : "";
+        // FIXED: ซ่อนสีชมพูในหน้ากลางคืนถ้าโหมด Privacy เปิดอยู่ (ส่วนใหญ่ GM ปิดโหมดนี้เพื่อเล่นต่อ แต่ทำเผื่อไว้)
+        const nameClass = (!isPrivacyMode && lovers.includes(i)) ? "lover-name" : "";
         
         if(type === "wolf") { 
             const limit = wolfBuff ? 2 : 1;
@@ -762,6 +760,7 @@ function resolveNight() {
             deadThisNight.push(p.name); 
             secretLogs.push(`${p.name} ทนพิษบาดแผลไม่ไหว (หนุ่มถึก)`);
             addLog(`${p.name} ทนพิษบาดแผลไม่ไหว`); 
+            if(p.role === 'wolf_cub') wolfBuff = true;
             checkDeathLinks(i, true); 
             p.toughGuyBleeding = false; 
         } 
@@ -788,6 +787,7 @@ function resolveNight() {
                 deadThisNight.push(players[t].name); 
                 secretLogs.push(`${players[t].name} ถูกหมาป่าสังหาร`);
                 addLog(`${players[t].name} ถูกหมาป่าฆ่า`); 
+                if(players[t].role === 'wolf_cub') wolfBuff = true;
                 checkDeathLinks(t, true); 
             }
         }
@@ -798,6 +798,7 @@ function resolveNight() {
         deadThisNight.push(players[witchPoisonTarget].name); 
         secretLogs.push(`${players[witchPoisonTarget].name} ถูกยาพิษแม่มดสังหาร`);
         addLog(`${players[witchPoisonTarget].name} ถูกแม่มดสังหาร`); 
+        if(players[witchPoisonTarget].role === 'wolf_cub') wolfBuff = true; 
         checkDeathLinks(witchPoisonTarget, true); 
         witchUsed = true; 
     }
@@ -818,7 +819,11 @@ function resolveNight() {
     });
     
     lastGuardTarget = nightGuardTarget; 
-    wolfBuff = false;
+    
+    if (wolfBuffUsed) {
+        wolfBuff = false;
+        wolfBuffUsed = false;
+    }
     
     let publicMsg = deadThisNight.length ? "ผู้เสียชีวิตเมื่อคืน: <br><br>" + deadThisNight.join("<br>") : "เมื่อคืนไม่มีผู้เสียชีวิต";
     if(silencedThisNight.length) publicMsg += "<br><br><span style='color:var(--warning)'>ผู้ที่ถูกเนรเทศงดออกเสียง:</span><br>" + silencedThisNight.join("<br>");
@@ -842,6 +847,7 @@ function checkDeathLinks(idx, isNight){
                 } else {
                     deadThisVote.push(players[l].name);
                 }
+                if(players[l].role === 'wolf_cub') wolfBuff = true; 
                 checkDeathLinks(l, isNight); 
             } 
         });
@@ -857,6 +863,7 @@ function checkDeathLinks(idx, isNight){
             } else {
                 deadThisVote.push(players[hh].name);
             }
+            if(players[hh].role === 'wolf_cub') wolfBuff = true;
             checkDeathLinks(hh, isNight); 
         } 
     }
@@ -960,8 +967,10 @@ function copySummary() {
 
 function renderGame() {
     gamePlayers.innerHTML = `<div class="game-grid">${players.map((p, i) => {
-        let team = "team-village", nameClass = lovers.includes(i) ? "lover-name" : "";
+        let team = "team-village", nameClass = "";
+        // FIXED: กำหนดเงื่อนไขซ่อนสีชื่อคู่รักเมื่ออยู่ใน Privacy Mode
         if(!isPrivacyMode) {
+            nameClass = lovers.includes(i) ? "lover-name" : "";
             if(p.isCult) team = "team-cult"; 
             else if(['wolf','wolf_cub','hell_hound','minion'].includes(p.role)) team = "team-wolf";
             else if(p.role === 'jester') team = "team-jester"; 
@@ -978,7 +987,7 @@ function renderGame() {
         </div>`;
     }).join("")}</div>`;
 }
- 
+
 function resetToSetup(){ location.reload(); }
 function endGameConfirm(){ if(confirm("ต้องการจบเกมและกลับหน้าแรกหรือไม่?")) resetToSetup(); }
 function backToSetup(){ gameScreen.classList.add("hidden"); setupScreen.classList.remove("hidden"); }
