@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Werewolf GM v5.74 (The Final Sounds)</title>
+<title>Werewolf GM v5.75 (The Memory Fix)</title>
 
 <style>
 :root {
@@ -141,7 +141,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
     <div class="glass-panel" style="text-align:center; position: relative;">
       <button id="langToggleMain" class="ghost" style="position: absolute; top: 10px; right: 10px; padding: 6px 10px; font-size: 12px;" onclick="toggleLanguage()">🇹🇭 TH</button>
       <h1 style="margin:0; font-size: 28px; letter-spacing: 1px;">WEREWOLF</h1>
-      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.74</p>
+      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.75</p>
       <div style="display:flex; gap:8px;"><input id="groupName" placeholder="ชื่อกลุ่มเล่น..."><button class="primary" onclick="createGroup()">สร้าง</button></div>
       <button class="ghost" style="width:100%; margin-top:10px;" onclick="createTestGroup()">สร้างห้องทดสอบแบบเต็ม</button>
     </div>
@@ -300,7 +300,6 @@ function toggleLanguage() {
 const wolfAudio = new Audio('wolf.mp3'); const alarmAudio = new Audio('alarm.mp3'); const morningAudio = new Audio('morning.mp3'); const bgmAudio = new Audio('bgm.mp3');
 const cardAudio = new Audio('card.mp3'); const shuffleAudio = new Audio('shuffle.mp3'); const winAudio = new Audio('win.mp3');
 
-// 🎧 New SFX Files
 const reloadAudio = new Audio('reload.mp3'); 
 const gunshotAudio = new Audio('gunshot.mp3'); 
 const blessAudio = new Audio('bless.mp3'); 
@@ -372,7 +371,7 @@ function getRandomWinMessage(type) { return winMessages[type][Math.floor(Math.ra
 let groups=[], currentGroup=null, players=[];
 let nightKillTargets=[], nightGuardTarget=null, lastGuardTarget=null, elderSilenceTarget=null, cultRecruits=[], lovers=[], wolfBuff=false, wolfBuffUsed=false, gameLogs=[], thugTargets = [], hellHoundPartner = null, lastKilledByVote = null, isPrivacyMode = false;
 let dayCount = 0, minionCheckDone = false, witchAction = null, witchPoisonTarget = null, nightStep = 0;
-let witchUsed = false; // กลับมาใช้ขวดเดียว (One Potion Rule)
+let witchUsed = false; 
 let timerInterval = null, timeRemaining = 0, nominatedPlayer = null;
 let deadThisNight = [], silencedThisNight = [], secretLogs = [], deadThisVote = [];
 
@@ -386,7 +385,17 @@ const uniqueRoles = ['seer', 'witch', 'cupid', 'bodyguard', 'elder', 'jester', '
 const roleBalanceValues = { villager: 1, seer: 7, witch: 3, cupid: -3, bodyguard: 3, pacifist: -2, fool: 2, prince: 3, hunter: 3, priest: 3, sick: 3, mason: 2, cursed: -3, drunk: 4, wolf: -6, wolf_cub: -8, jester: -2, wolf_human: -1, tough_guy: 3, elder: 1, minion: -6, cult_leader: 1, lone_wolf: -5, thug: 0, hell_hound: -4, wolf_man: -9, vampire: -7 };
 
 function save(){ localStorage.setItem("groups_v5", JSON.stringify(groups)); }
-function load(){ groups = JSON.parse(localStorage.getItem("groups_v5") || "[]"); renderGroups(); }
+
+function load(){ 
+    groups = JSON.parse(localStorage.getItem("groups_v5") || "[]"); 
+    renderGroups(); 
+    let reopen = sessionStorage.getItem("reopenGroup");
+    if(reopen !== null && groups[parseInt(reopen)]) {
+        sessionStorage.removeItem("reopenGroup");
+        openGroup(parseInt(reopen));
+    }
+}
+
 function addLog(msg, isHeader = false){ const time = new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}); const logMsg = isHeader ? `<div class="log-header">${msg}</div>` : `<div>[${time}] ${msg}</div>`; gameLogs.push(logMsg); document.getElementById("gameLog").innerHTML = [...gameLogs].reverse().join(""); }
 function calculateBalance() { let score = 0; players.forEach(p => score += roleBalanceValues[p.role] || 0); document.getElementById("totalBalanceScore").innerText = score > 0 ? "+" + score : score; }
 function createGroup(){ const name = groupName.value; if(!name) return; groups.push({name: name, players: []}); save(); renderGroups(); groupName.value = ""; }
@@ -426,8 +435,14 @@ function togglePrivacy() { isPrivacyMode = !isPrivacyMode; document.getElementBy
 
 function startGame(){
     if(players.length < 3){ alert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
-    // Reset all statuses, making sure cult_leader gets the cult mark correctly at start
-    players.forEach(p => { p.alive = true; p.toughGuyBleeding = false; p.silenced = false; p.isCult = (p.role === 'cult_leader'); });
+    
+    // --- บันทึกรายชื่อและบทบาทลงฐานข้อมูลก่อนเริ่มเกม ---
+    if(currentGroup !== null) {
+        groups[currentGroup].players = JSON.parse(JSON.stringify(players));
+        save();
+    }
+    
+    players.forEach(p => { p.alive = true; p.toughGuyBleeding = false; p.silenced = false; p.isCult = false; });
     lovers = []; lastGuardTarget = null; gameLogs = []; wolfBuff = false; wolfBuffUsed = false; thugTargets = []; hellHoundPartner = null; lastKilledByVote = null; dayCount = 1; minionCheckDone = false;
     witchUsed = false; witchAction = null; witchPoisonTarget = null; vampireKillTarget = null;
     priestBlessedTarget = null; priestSetupDone = false; wolvesSick = false; pendingHunters = []; masonCheckDone = false; thugSetupDone = false; makeWolvesSickNextNight = false; deadThisVote = [];
@@ -806,7 +821,7 @@ function finishGame(type, winners, isCoWin = false) {
     document.getElementById("winnerNamesDisplay").innerHTML = `<div style="color:var(--success); font-weight:bold; margin-bottom:10px; font-size:18px;">รายชื่อผู้ที่ได้รับชัยชนะ:</div>${winners.join("<br>")}`;
     document.getElementById("summaryPlayers").innerHTML = players.map((p, i) => {
         const nameClass = lovers.includes(i) ? "lover-name" : ""; 
-        let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (p.silenced ? ' 🔇' : ''); 
+        let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (p.silenced ? ' 🔇' : ''); 
         return `<div class="game-card ${p.alive ? '' : 'dead'}"><div><b class="${nameClass}" style="font-size:15px;">${p.name}</b> ${status}</div><div class="role-pill ${p.role}">${getRoleName(p.role)}</div></div>`;
     }).join("");
 }
@@ -829,8 +844,11 @@ function renderGame() {
     }).join("") + `</div>`;
 }
 
-function copySummary() { let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n`; players.forEach((p, i) => { let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (p.silenced ? ' 🔇' : ''); text += `${i+1}. ${p.name} ${status} : ${getRoleName(p.role)} (${p.alive ? 'รอด' : 'ตาย'})\n`; }); navigator.clipboard.writeText(text).then(() => alert("คัดลอกแล้ว!")); }
-function resetToSetup(){ location.reload(); }
+function copySummary() { let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n`; players.forEach((p, i) => { let status = (p.isCult ? ' 🪬' : '') + (p.silenced ? ' 🔇' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : ''); text += `${i+1}. ${p.name} ${status} : ${getRoleName(p.role)} (${p.alive ? 'รอด' : 'ตาย'})\n`; }); navigator.clipboard.writeText(text).then(() => alert("คัดลอกแล้ว!")); }
+function resetToSetup(){ 
+    if(currentGroup !== null) sessionStorage.setItem("reopenGroup", currentGroup);
+    location.reload(); 
+}
 function endGameConfirm(){ if(confirm("จบเกม?")) resetToSetup(); }
 function backToSetup(){ document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); }
 load();
