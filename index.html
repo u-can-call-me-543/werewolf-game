@@ -3,30 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Werewolf GM v5.61 (Final Goodnight)</title>
+<title>Werewolf GM v5.74 (The Final Sounds)</title>
 
 <style>
 :root {
-  --primary: #3b82f6; --danger: #ef4444; --success: #10b981; --warning: #fbbf24;
-  --special: #a855f7; --lone-wolf: #708090; 
-  --thug: #f97316; --cult: #0ea5e9; 
-  --lovers-pink: #f472b6; 
-  --glass: rgba(15, 23, 42, 0.9); --glass-border: rgba(255, 255, 255, 0.08);
+  /* Pastel Colors for UI Backgrounds */
+  --primary: #60a5fa;      
+  --danger: #fb7185;       
+  --success: #34d399;      
+  --warning: #fbbf24;      
+  --special: #c084fc;      
+  --lone-wolf: #94a3b8;    
+  --thug: #fb923c;         
+  --cult: #38bdf8;         
+  --lovers-pink: #f472b6;  
+  --jester: #d6a37a;       
+  
+  --glass: rgba(15, 23, 42, 0.9); 
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 body {
   font-family: 'Segoe UI', Roboto, sans-serif;
   background: #020617; color: #f1f5f9; margin: 0; padding: 0; min-height: 100vh; user-select: none;
 }
 
-/* 📱 ปรับแต่ง CSS สำหรับ Mobile (ลดขนาด Padding และ Margin ลงให้กระชับ) */
 .container { max-width: 1000px; margin: 0 auto; padding: 12px 12px 80px; }
 .screen { animation: fadeIn 0.3s ease-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ลดความพองของกล่องหลัก */
 .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; padding: 16px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
 
-/* สไตล์ใหม่สำหรับกล่องรายชื่อกลุ่มหน้าแรกเท่านั้น (ให้ดูหรูหราขึ้น) */
 .group-card {
   background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
   border-radius: 18px;
@@ -42,17 +48,15 @@ body {
 }
 .group-card:active { transform: scale(0.98); }
 
-/* ปรับปุ่มและช่องกรอกข้อมูลให้บางลงเล็กน้อย */
 button { padding: 12px 16px; border: none; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
 button:active { transform: scale(0.92); }
-button.primary { background: var(--primary); color: white; }
-button.danger { background: var(--danger); color: white; }
-button.success { background: var(--success); color: white; }
-button.warning { background: var(--warning); color: black; }
+button.primary { background: var(--primary); color: #000; }
+button.danger { background: var(--danger); color: #000; }
+button.success { background: var(--success); color: #000; }
+button.warning { background: var(--warning); color: #000; }
 button.ghost { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--glass-border); }
 input, select { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--glass-border); border-radius: 14px; padding: 12px; color: white !important; font-size: 15px; width: 100%; box-sizing: border-box; }
 
-/* 🎵 Mini Audio Controller */
 #floatingAudio {
   position: fixed; top: 15px; right: 15px; z-index: 9999;
   background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
@@ -62,14 +66,13 @@ input, select { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--glass
 }
 #bgmIcon { font-size: 20px; }
 
-/* 🃏 Tarot Layout (ย่อขนาดไพ่ลงอย่างมาก เพื่อไม่ให้กินพื้นที่แนวตั้งบนมือถือ) */
 .tarot-area { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px; }
 .tarot-deck { position: relative; width: 140px; height: 210px; cursor: pointer; perspective: 1000px; }
 .tarot-card { position: absolute; width: 100%; height: 100%; background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid var(--warning); border-radius: 16px; padding: 15px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s; backface-visibility: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
 .tarot-card .card-content { text-align: center; opacity: 0; transition: 0.3s; width: 100%; }
 .tarot-card.active .card-content { opacity: 1; }
 .tarot-card .t-icon { font-size: 38px; margin-bottom: 6px; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3)); }
-.tarot-card .t-name { color: var(--warning); font-size: 15px; font-weight: 900; margin-bottom: 6px; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 4px; width: 100%; }
+.tarot-card .t-name { color: var(--warning); font-size: 14px; font-weight: 900; margin-bottom: 6px; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 4px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tarot-card .t-desc { color: #cbd5e1; font-size: 10px; line-height: 1.3; }
 
 .tarot-card:nth-child(1) { transform: translateZ(0); z-index: 10; }
@@ -81,24 +84,28 @@ input, select { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--glass
 
 button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); padding: 14px 30px; font-size: 18px; border-radius: 99px; width: 100%; max-width: 200px; color: white; font-weight: bold; margin: 20px auto; display: block; border: 1px solid rgba(255,255,255,0.2); letter-spacing: 1px; }
 
-/* 🕹️ Game UI (ลดช่องว่างการ์ดผู้เล่น) */
 .game-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
 @media (min-width: 600px) { .game-grid { grid-template-columns: 1fr 1fr; } }
 .game-card { background: rgba(30, 41, 59, 0.4); border-radius: 18px; padding: 12px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; border-left: 6px solid #475569; transition: 0.3s; }
-.team-village { border-left-color: var(--success); background: rgba(16, 185, 129, 0.1); }
-.team-wolf { border-left-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-.team-jester { border-left-color: var(--special); background: rgba(168, 85, 247, 0.1); }
-.team-thug { border-left-color: var(--thug); background: rgba(249, 115, 22, 0.1); }
-.team-lone { border-left-color: var(--lone-wolf); background: rgba(112, 128, 144, 0.1); }
-.team-cult { border-left-color: var(--cult); background: rgba(14, 165, 233, 0.15); }
 
+/* Team Background Colors (Pastel) */
+.team-village { border-left-color: var(--success); background: rgba(52, 211, 153, 0.1); }
+.team-wolf { border-left-color: var(--danger); background: rgba(251, 113, 133, 0.1); }
+.team-jester { border-left-color: var(--jester); background: rgba(214, 163, 122, 0.1); }
+.team-vampire { border-left-color: var(--special); background: rgba(192, 132, 252, 0.1); }
+.team-thug { border-left-color: var(--thug); background: rgba(251, 146, 60, 0.1); }
+.team-lone { border-left-color: var(--lone-wolf); background: rgba(148, 163, 184, 0.1); }
+.team-cult { border-left-color: var(--cult); background: rgba(56, 189, 248, 0.1); }
+
+/* Vibrant Role Pills */
 .role-pill { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: 900; text-align: center; color: white; min-width: 75px; }
-.villager, .seer, .witch, .bodyguard, .cupid, .tough_guy, .elder, .wolf_human, .pacifist, .fool { background: #10b981; }
-.wolf, .wolf_cub, .minion, .hell_hound { background: #ef4444; }
-.jester { background: var(--special); }
-.cult_leader { background: var(--cult); }
-.thug { background: var(--thug); }
-.lone_wolf { background: var(--lone-wolf); }
+.villager, .seer, .witch, .bodyguard, .cupid, .tough_guy, .elder, .wolf_human, .pacifist, .fool, .prince, .hunter, .priest, .sick, .mason, .cursed, .drunk { background: #10b981; }
+.wolf, .wolf_cub, .minion, .hell_hound, .wolf_man { background: #ef4444; }
+.vampire { background: #a855f7; }
+.jester { background: #14b8a6; }
+.cult_leader { background: #0ea5e9; }
+.thug { background: #f97316; }
+.lone_wolf { background: #708090; }
 
 .selected-card { outline: 2px solid var(--warning); background: rgba(251, 191, 36, 0.15) !important; }
 .dead { opacity: 0.25; filter: grayscale(100%); pointer-events: none; }
@@ -109,13 +116,12 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 #gameLog { font-size: 12px; color: #94a3b8; padding: 12px; height: 110px; overflow-y: auto; background: rgba(0,0,0,0.4); border-radius: 18px; border: 1px solid var(--glass-border); line-height: 1.5; margin-top: 15px; }
 .log-header { color: var(--warning); font-weight: bold; border-bottom: 1px solid rgba(251, 191, 36, 0.2); margin-top: 8px; padding-bottom: 4px; }
 
-/* ⏱️ Timer & Modals */
 #fullScreenTimer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(10px); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
 #fullScreenTimer.active { display: flex; }
 #massiveTimerDisplay { font-size: clamp(60px, 18vw, 120px); font-weight: bold; color: white; margin: 15px 0; font-variant-numeric: tabular-nums; line-height: 1; }
 
-#trialModal, #nightSummaryModal, #dayDeathModal { position:fixed; top:0; left:0; width: 100vw; height: 100vh; background:rgba(2, 6, 23, 0.95); z-index:2500; display:none; align-items:center; justify-content:center; padding:15px; box-sizing: border-box; }
-#trialModal.active, #nightSummaryModal.active, #dayDeathModal.active { display:flex; }
+#trialModal, #nightSummaryModal, #dayDeathModal, #hunterModal { position:fixed; top:0; left:0; width: 100vw; height: 100vh; background:rgba(2, 6, 23, 0.95); z-index:2500; display:none; align-items:center; justify-content:center; padding:15px; box-sizing: border-box; }
+#trialModal.active, #nightSummaryModal.active, #dayDeathModal.active, #hunterModal.active { display:flex; }
 </style>
 </head>
 <body>
@@ -127,16 +133,17 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 <div id="fullScreenTimer">
    <div style="font-size: 24px; color: var(--warning); font-weight: bold; text-align: center;">เวลาอภิปรายสืบสวน</div>
    <div id="massiveTimerDisplay">00:00</div>
-   <button class="danger" style="padding: 14px 30px; font-size: 16px;" onclick="stopCustomTimer()">หยุดเวลาและปิดหน้าจอ</button>
+   <button class="danger" style="padding: 14px 30px; font-size: 16px; color: white;" onclick="stopCustomTimer()">หยุดเวลาและปิดหน้าจอ</button>
 </div>
 
 <div class="container">
   <div id="groupScreen" class="screen">
-    <div class="glass-panel" style="text-align:center;">
+    <div class="glass-panel" style="text-align:center; position: relative;">
+      <button id="langToggleMain" class="ghost" style="position: absolute; top: 10px; right: 10px; padding: 6px 10px; font-size: 12px;" onclick="toggleLanguage()">🇹🇭 TH</button>
       <h1 style="margin:0; font-size: 28px; letter-spacing: 1px;">WEREWOLF</h1>
-      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.61</p>
+      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.74</p>
       <div style="display:flex; gap:8px;"><input id="groupName" placeholder="ชื่อกลุ่มเล่น..."><button class="primary" onclick="createGroup()">สร้าง</button></div>
-      <button class="ghost" style="width:100%; margin-top:10px;" onclick="createTestGroup()">สร้างห้องทดสอบ</button>
+      <button class="ghost" style="width:100%; margin-top:10px;" onclick="createTestGroup()">สร้างห้องทดสอบแบบเต็ม</button>
     </div>
     <div id="groupList"></div>
 
@@ -145,34 +152,43 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
         <div>
           <div class="deck-label">สำรับแห่งแสง (ชาวบ้าน)</div>
           <div class="tarot-deck" id="deckVillage" onclick="shuffleDeck('deckVillage')">
-            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🧑‍🌾</div><div class="t-name">ชาวบ้าน</div><div class="t-desc">ผู้บริสุทธิ์ไร้พลังวิเศษที่น่าสงสารท่ามกลางเหล่าผู้มีความสามารถ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🔮</div><div class="t-name">เทพพยากรณ์</div><div class="t-desc">ส่องดูความลับของผู้อื่น เพื่อกระชากหน้ากากหมาป่า</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🧪</div><div class="t-name">แม่มด</div><div class="t-desc">ปรมาจารย์ผู้ครอบครองน้ำอมฤตต่อลมหายใจและยาพิษมรณะ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🛡️</div><div class="t-name">บอดี้การ์ด</div><div class="t-desc">อดีตทหารกล้าที่ยอมสละร่างเป็นโล่เนื้อกำบังเหยื่อจากกรงเล็บ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">💘</div><div class="t-name">กามเทพ</div><div class="t-desc">ผู้ผูกวิญญาณสองดวง หากใครถูกพรากลมหายใจ อีกคนจะตายตามทันที</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🏋️</div><div class="t-name">หนุ่มถึก</div><div class="t-desc">ทนพิษบาดแผลหมาป่าได้ และไปสิ้นใจในเช้าถัดไปแทน</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">👵</div><div class="t-name">แม่เฒ่า</div><div class="t-desc">วาจาศักดิ์สิทธิ์ สามารถสั่งเนรเทศให้ผู้อื่นหมดสิทธิ์ออกเสียงโหวต</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🤪</div><div class="t-name">ไอ้ทึ่ม</div><div class="t-desc">ถูกชักจูงง่ายดาย แต่ถ้าถูกจับแขวนคอ จะรอดชีวิตมาได้อย่างปาฏิหาริย์</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🕊️</div><div class="t-name">ผู้รักสันติ</div><div class="t-desc">รังเกียจความรุนแรง จะโหวตไม่เห็นด้วยกับการแขวนคอเสมอ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🌗</div><div class="t-name">ลูกครึ่งฯ</div><div class="t-desc">สายเลือดต้องคำสาป หากถูกตรวจ ภาพที่ปรากฏจะเป็นหมาป่าเสมอ</div></div></div>
+            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🧑‍🌾</div><div id="name_villager" class="t-name">ชาวบ้าน</div><div class="t-desc">ผู้บริสุทธิ์ไร้พลังวิเศษที่น่าสงสารท่ามกลางเหล่าผู้มีความสามารถ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🔮</div><div id="name_seer" class="t-name">เทพพยากรณ์</div><div class="t-desc">ส่องดูความลับของผู้อื่น เพื่อกระชากหน้ากากหมาป่า</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🧙‍♀️</div><div id="name_witch" class="t-name">แม่มด</div><div class="t-desc">ปรมาจารย์ผู้ครอบครองน้ำอมฤตต่อลมหายใจและยาพิษมรณะ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🛡️</div><div id="name_bodyguard" class="t-name">บอดี้การ์ด</div><div class="t-desc">อดีตทหารกล้าที่ยอมสละร่างเป็นโล่เนื้อกำบังเหยื่อจากกรงเล็บ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">💘</div><div id="name_cupid" class="t-name">กามเทพ</div><div class="t-desc">ผู้ผูกวิญญาณสองดวง หากใครถูกพรากลมหายใจ อีกคนจะตายตามทันที</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">💪</div><div id="name_tough_guy" class="t-name">หนุ่มถึก</div><div class="t-desc">ทนพิษบาดแผลหมาป่าได้ และไปสิ้นใจในเช้าถัดไปแทน</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">👵</div><div id="name_elder" class="t-name">แม่เฒ่า</div><div class="t-desc">วาจาศักดิ์สิทธิ์ สามารถสั่งเนรเทศให้ผู้อื่นหมดสิทธิ์ออกเสียงโหวต</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🤪</div><div id="name_fool" class="t-name">ไอ้ทึ่ม</div><div class="t-desc">ถูกชักจูงง่ายดาย หากมีการโหวตแขวนคอจะยกมือเห็นด้วยเสมอ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🕊️</div><div id="name_pacifist" class="t-name">ผู้รักสันติ</div><div class="t-desc">รังเกียจความรุนแรง จะโหวตไม่เห็นด้วยกับการแขวนคอเสมอ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🌗</div><div id="name_wolf_human" class="t-name">ลูกครึ่งฯ</div><div class="t-desc">สายเลือดต้องคำสาป หากถูกตรวจ ภาพที่ปรากฏจะเป็นหมาป่าเสมอ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">👑</div><div id="name_prince" class="t-name">เจ้าชาย</div><div class="t-desc">ข้าคือสายเลือดแห่งกษัตริย์! ลานประหารนี้ไม่อาจพรากลมหายใจข้าได้... อย่างน้อยก็ในครั้งแรก</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🏹</div><div id="name_hunter" class="t-name">นายพราน</div><div class="t-desc">ศรที่ง้างไว้พร้อมเสมอ หากข้าต้องลงนรก ใครสักคนต้องไปเป็นเพื่อนข้า!</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">✞</div><div id="name_priest" class="t-name">นักบวช</div><div class="t-desc">บทสวดในคืนแรก จะมอบพรคุ้มครองผู้ศรัทธาให้รอดจากลานประหารได้หนึ่งครา</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🤢</div><div id="name_sick" class="t-name">ผู้ป่วยติดเชื้อ</div><div class="t-desc">หากอสูรร้ายกลืนกินข้า พวกมันจะต้องป่วยและไร้เรี่ยวแรงล่าเหยื่อในคืนถัดไป</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🤝</div><div id="name_mason" class="t-name">เมสัน</div><div class="t-desc">สบตาเพื่อยืนยันสายเลือด ภราดรภาพของเราแข็งแกร่งกว่าคำลวงใดๆ</div></div></div>
           </div>
         </div>
         <div>
           <div class="deck-label">สำรับแห่งเงามืด (หมาป่า)</div>
           <div class="tarot-deck" id="deckWolf" onclick="shuffleDeck('deckWolf')">
-            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🐺</div><div class="t-name">หมาป่า</div><div class="t-desc">อสูรกายกระหายเลือดที่แฝงตัวเนียนกริบในหมู่ชน</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🐕</div><div class="t-name">ลูกหมาป่า</div><div class="t-desc">หากมันตาย ฝูงหมาป่าจะคลุ้มคลั่งล่าได้ 2 คนในคืนถัดไป</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">👺</div><div class="t-name">สมุนรับใช้</div><div class="t-desc">ล่วงรู้ตัวตนหมาป่า พร้อมสละชีพเพื่อกรุยทางให้นายเหนือหัว</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🔥</div><div class="t-name">หมาป่าโลกันตร์</div><div class="t-desc">เลือกคู่ชีวิตลับหนึ่งคน หากยอดรักสิ้นใจ มันจะตายตามไปด้วย</div></div></div>
+            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🐺</div><div id="name_wolf" class="t-name">หมาป่า</div><div class="t-desc">อสูรกายกระหายเลือดที่แฝงตัวเนียนกริบในหมู่ชน</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🐕</div><div id="name_wolf_cub" class="t-name">ลูกหมาป่า</div><div class="t-desc">หากมันตาย ฝูงหมาป่าจะคลุ้มคลั่งล่าได้ 2 คนในคืนถัดไป</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🎭</div><div id="name_minion" class="t-name">สมุนรับใช้</div><div class="t-desc">ล่วงรู้ตัวตนหมาป่า พร้อมสละชีพเพื่อกรุยทางให้นายเหนือหัว</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🔥</div><div id="name_hell_hound" class="t-name">หมาป่าโลกันตร์</div><div class="t-desc">เลือกคู่ชีวิตลับหนึ่งคน หากยอดรักสิ้นใจ มันจะตายตามไปด้วย</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🕵️‍♂️</div><div id="name_wolf_man" class="t-name">หมาป่ามนุษย์</div><div class="t-desc">ในสายตาพระเจ้า ข้าคือมนุษย์ผู้บริสุทธิ์ แต่ในเงามืด ข้าคือมัจจุราช</div></div></div>
           </div>
         </div>
         <div>
           <div class="deck-label">สำรับแห่งโชคชะตา (พิเศษ)</div>
           <div class="tarot-deck" id="deckSpecial" onclick="shuffleDeck('deckSpecial')">
-            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🃏</div><div class="t-name">ยาจก</div><div class="t-desc">ปั่นหัวชาวบ้าน ให้ลากตัวเขาไปแขวนคอให้จงได้</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🪬</div><div class="t-name">เจ้าลัทธิ</div><div class="t-desc">ศาสดาที่คอยล้างสมองผู้คน หากเปลี่ยนทุกคนเป็นสาวกได้ เขาจะชนะ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">👊</div><div class="t-name">อันธพาล</div><div class="t-desc">ล็อกเป้าหมายมรณะ ต้องส่งพวกมันลงนรกให้ครบทุกคนเพื่อชัยชนะ</div></div></div>
-            <div class="tarot-card"><div class="card-content"><div class="t-icon">🌑</div><div class="t-name">หมาป่าเดียวดาย</div><div class="t-desc">หักหลังพี่น้อง รอคอยเวลาเพื่อยืนหยัดเป็นผู้ชนะเพียงหนึ่งเดียว</div></div></div>
+            <div class="tarot-card active"><div class="card-content"><div class="t-icon">🃏</div><div id="name_jester" class="t-name">ยาจก</div><div class="t-desc">ปั่นหัวชาวบ้าน ให้ลากตัวเขาไปแขวนคอให้จงได้</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🪬</div><div id="name_cult_leader" class="t-name">เจ้าลัทธิ</div><div class="t-desc">ศาสดาที่คอยล้างสมองผู้คน หากเปลี่ยนทุกคนเป็นสาวกได้ เขาจะชนะ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">👊</div><div id="name_thug" class="t-name">อันธพาล</div><div class="t-desc">ล็อกเป้าหมายมรณะ ต้องส่งพวกมันลงนรกให้ครบทุกคนเพื่อชัยชนะ</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🌑</div><div id="name_lone_wolf" class="t-name">หมาป่าเดียวดาย</div><div class="t-desc">หักหลังพี่น้อง รอคอยเวลาเพื่อยืนหยัดเป็นผู้ชนะเพียงหนึ่งเดียว</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🧟</div><div id="name_cursed" class="t-name">ผู้ต้องสาป</div><div class="t-desc">ข้าคือมนุษย์... จนกว่าคมเขี้ยวจะเจาะทะลุผิวหนัง แล้วสัญชาตญาณดิบจะตื่นขึ้น!</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🍺</div><div id="name_drunk" class="t-name">คนขี้เมา</div><div class="t-desc">ข้าเป็นใคร? พวกเจ้าเป็นใคร? ขอเวลาข้าสร่างเมาสักสามคืนเถอะ...</div></div></div>
+            <div class="tarot-card"><div class="card-content"><div class="t-icon">🧛🏻‍♀️</div><div id="name_vampire" class="t-name">แวมไพร์</div><div class="t-desc">อมตะยามราตรี ดื่มเลือดทุกสรรพสิ่งจนกว่าจะเหลือเพียงข้าผู้เดียว!</div></div></div>
           </div>
         </div>
       </div>
@@ -192,10 +208,11 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   </div>
 
   <div id="gameScreen" class="hidden screen">
-    <div class="glass-panel" style="display:flex; gap:8px; padding: 10px;">
+    <div class="glass-panel" style="display:flex; gap:6px; padding: 10px; flex-wrap: wrap;">
       <button class="ghost" style="flex:1" onclick="backToSetup()">ย้อน</button>
-      <button id="togglePrivacy" class="ghost" style="flex:1" onclick="togglePrivacy()">👁️ ซ่อนบท</button>
-      <button class="danger" style="flex:1" onclick="endGameConfirm()">จบเกม</button>
+      <button id="togglePrivacy" class="ghost" style="flex:1.5" onclick="togglePrivacy()">👁️ ซ่อนบท</button>
+      <button id="langToggleGame" class="ghost" style="flex:1" onclick="toggleLanguage()">🇹🇭 TH</button>
+      <button class="danger" style="flex:1; color: white;" onclick="endGameConfirm()">จบเกม</button>
     </div>
 
     <div id="dayTimerPanel" class="glass-panel hidden" style="text-align:center; padding:12px;">
@@ -206,7 +223,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
       <button class="primary" style="width:100%; font-size:16px; padding:12px;" onclick="startCustomTimer()">เริ่มจับเวลาสืบสวน</button>
     </div>
 
-    <button id="btnStartNight" class="primary hidden" style="width:100%; font-size: 16px; margin-bottom: 15px; height: 45px; background: #1e1b4b;" onclick="startNight()">🌙 เริ่มช่วงกลางคืน</button>
+    <button id="btnStartNight" class="primary hidden" style="width:100%; font-size: 16px; margin-bottom: 15px; height: 45px; background: #1e1b4b; color: white;" onclick="startNight()">🌙 เริ่มช่วงกลางคืน</button>
     
     <div id="gamePlayers"></div>
     <div id="gameLog"></div>
@@ -217,7 +234,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
       <h1 id="winTitle" style="color:var(--warning); margin-bottom:10px; font-size: 24px;"></h1>
       <p id="winDesc" style="font-style:italic; color:#94a3b8; margin-bottom:20px; font-size: 14px;"></p>
       <div id="winnerNamesDisplay" style="font-size: 14px;"></div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top: 15px;"><button class="primary" onclick="copySummary()">คัดลอกผล</button><button class="danger" onclick="resetToSetup()">เล่นอีกครั้ง</button></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top: 15px;"><button class="primary" onclick="copySummary()">คัดลอกผล</button><button class="danger" style="color:white;" onclick="resetToSetup()">เล่นอีกครั้ง</button></div>
     </div>
     <div id="summaryPlayers" class="game-grid"></div>
   </div>
@@ -228,7 +245,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
      <h2 style="color:var(--danger); margin-top:0;">ศาลตัดสินประหาร</h2>
      <h1 id="trialPlayerName" style="font-size:30px;">Name</h1>
      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="danger" onclick="verdict(true)">แขวนคอ</button>
+        <button class="danger" style="color:white;" onclick="verdict(true)">แขวนคอ</button>
         <button class="success" onclick="verdict(false)">ปล่อยตัว</button>
         <button class="ghost" onclick="closeTrial()">ยกเลิก</button>
      </div>
@@ -247,208 +264,148 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   <div class="glass-panel" style="width:100%; max-width:350px;">
      <h2 style="color:var(--warning); text-align:center; margin-top:0;">สรุปเหตุการณ์เมื่อคืน</h2>
      <div id="publicNightSummary" style="color:white; font-weight:bold; text-align:center; margin-bottom:15px; font-size:16px;"></div>
-     <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:15px;"><ul id="secretNightSummary" style="margin:0; padding-left:20px; line-height:1.6; font-size: 14px;"></ul></div>
+     <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:15px; max-height: 250px; overflow-y: auto;">
+         <ul id="secretNightSummary" style="margin:0; padding-left:20px; line-height:1.6; font-size: 14px;"></ul>
+     </div>
      <button class="success" style="width:100%; margin-top:15px; font-size:16px;" onclick="closeNightSummary()">เริ่มต้นวันใหม่</button>
   </div>
 </div>
 
+<div id="hunterModal">
+  <div class="glass-panel" style="width:100%; text-align:center; max-width:350px; border:2px solid var(--warning);">
+     <h2 style="color:var(--warning); margin-top:0;">🏹 นายพรานล้างแค้น!</h2>
+     <p style="font-size:14px; margin-bottom:15px;"><b id="hunterShooterName" style="color:var(--danger); font-size:18px;">Name</b> สิ้นใจแล้ว! <br>แต่ก่อนตายขอยิงศรลาก 1 คนไปลงนรกด้วย</p>
+     <div id="hunterTargets" class="game-grid" style="max-height: 45vh; overflow-y: auto; padding-right: 5px;"></div>
+  </div>
+</div>
+
 <script>
+// ================= ⚙️ Language Logic ================= //
+let currentLang = 'TH';
+const roleNameTH={ villager:"🧑‍🌾 ชาวบ้าน", seer:"🔮 เทพพยากรณ์", witch:"🧙‍♀️ แม่มด", cupid:"💘 กามเทพ", bodyguard:"🛡️ บอดี้การ์ด", pacifist:"🕊️ ผู้รักสันติ", fool:"🤪 ไอ้ทึ่ม", prince:"👑 เจ้าชาย", hunter:"🏹 นายพราน", priest:"✞ นักบวช", sick:"🤢 ผู้ป่วยติดเชื้อ", mason:"🤝 เมสัน", wolf:"🐺 หมาป่า", wolf_cub:"🐕 ลูกหมาป่า", jester:"🃏 ยาจก", wolf_human:"🌓 ลูกครึ่งมนุษย์หมาป่า", tough_guy:"💪 หนุ่มถึก", elder:"👵 แม่เฒ่า", minion:"🎭 สมุนรับใช้", cult_leader:"🪬 เจ้าลัทธิ", lone_wolf:"🌑 หมาป่าเดียวดาย", thug:"👊 อันธพาล", hell_hound:"🔥 หมาป่าโลกันตร์", cursed:"🧟 ผู้ต้องสาป", drunk:"🍺 คนขี้เมา", wolf_man:"🕵️‍♂️ หมาป่ามนุษย์", vampire:"🧛🏻‍♀️ แวมไพร์" };
+const roleNameEN={ villager:"🧑‍🌾 Villager", seer:"🔮 Seer", witch:"🧙‍♀️ Witch", cupid:"💘 Cupid", bodyguard:"🛡️ Bodyguard", pacifist:"🕊️ Pacifist", fool:"🤪 Fool", prince:"👑 Prince", hunter:"🏹 Hunter", priest:"✞ Priest", sick:"🤢 Sick", mason:"🤝 Mason", wolf:"🐺 Werewolf", wolf_cub:"🐕 Wolf Cub", jester:"🃏 Jester", wolf_human:"🌓 Wolf-Human", tough_guy:"💪 Tough Guy", elder:"👵 Elder", minion:"🎭 Minion", cult_leader:"🪬 Cult Leader", lone_wolf:"🌑 Lone Wolf", thug:"👊 Thug", hell_hound:"🔥 Hell Hound", cursed:"🧟 Cursed", drunk:"🍺 Drunk", wolf_man:"🕵️‍♂️ Wolf Man", vampire:"🧛🏻‍♀️ Vampire" };
+
+function getRoleName(role) { return currentLang === 'TH' ? roleNameTH[role] : roleNameEN[role]; }
+
+function toggleLanguage() {
+    currentLang = currentLang === 'TH' ? 'EN' : 'TH';
+    const btnText = currentLang === 'TH' ? '🇹🇭 TH' : '🇬🇧 EN';
+    document.getElementById('langToggleMain').innerText = btnText; document.getElementById('langToggleGame').innerText = btnText;
+    Object.keys(roleNameTH).forEach(key => { const el = document.getElementById('name_' + key); if(el) el.innerText = currentLang === 'TH' ? roleNameTH[key].split(" ")[1] : roleNameEN[key].split(" ")[1]; });
+    if(!document.getElementById("setupScreen").classList.contains("hidden")) renderSetup();
+    if(!document.getElementById("gameScreen").classList.contains("hidden")) renderGame();
+}
+
 // ================= 🎵 Audio ================= //
 const wolfAudio = new Audio('wolf.mp3'); const alarmAudio = new Audio('alarm.mp3'); const morningAudio = new Audio('morning.mp3'); const bgmAudio = new Audio('bgm.mp3');
 const cardAudio = new Audio('card.mp3'); const shuffleAudio = new Audio('shuffle.mp3'); const winAudio = new Audio('win.mp3');
-bgmAudio.loop = true; 
-bgmAudio.volume = 0.3;
-let isMuted = false;
 
-function toggleMute(){ 
-    isMuted = !isMuted; 
-    const icon = document.getElementById('bgmIcon'); 
-    if(isMuted){ bgmAudio.volume = 0; icon.innerText = "🔇"; } 
-    else { bgmAudio.volume = 0.3; icon.innerText = "🎵"; } 
-}
+// 🎧 New SFX Files
+const reloadAudio = new Audio('reload.mp3'); 
+const gunshotAudio = new Audio('gunshot.mp3'); 
+const blessAudio = new Audio('bless.mp3'); 
+const hiccupAudio = new Audio('hiccup.mp3'); 
+const gavelAudio = new Audio('gavel.mp3');
+
+bgmAudio.loop = true; bgmAudio.volume = 0.3; let isMuted = false;
+function toggleMute(){ isMuted = !isMuted; const icon = document.getElementById('bgmIcon'); if(isMuted){ bgmAudio.volume = 0; icon.innerText = "🔇"; } else { bgmAudio.volume = 0.3; icon.innerText = "🎵"; } }
 
 // ================= 🃏 Tarot Logic ================= //
-function shuffleDeck(id){ 
-    try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} 
-    const deck = document.getElementById(id);
-    if (!deck) return;
-    const topCard = deck.children[0]; 
-    if (!topCard) return;
-    
-    topCard.classList.add('shuffling'); 
-    setTimeout(() => {
-        topCard.classList.remove('shuffling'); 
-        deck.appendChild(topCard); 
-        deck.children[0].classList.add('active');
-    }, 200); 
-}
-
-function predictAll(){ 
-    const btn = document.getElementById('btnPredict'); 
-    if(btn.disabled) return; 
-    btn.disabled = true; btn.innerHTML = "กำลังสื่อสาร..."; 
-    try { shuffleAudio.currentTime = 0; shuffleAudio.play(); } catch(e){} 
-    
-    const fastStyle = document.createElement("style");
-    fastStyle.innerText = `.tarot-card { transition: transform 0.1s !important; } .shuffling { transform: translateX(100px) rotate(15deg) !important; }`;
-    document.head.appendChild(fastStyle);
-    
-    const endTime = Date.now() + 2000; 
-    
-    function loop(){ 
-        ['deckVillage','deckWolf','deckSpecial'].forEach(id => { 
-            const deck = document.getElementById(id); 
-            if(!deck) return;
-            const topCard = deck.children[0]; 
-            if(!topCard) return;
-            topCard.classList.add('shuffling'); 
-            setTimeout(() => {
-                topCard.classList.remove('shuffling'); 
-                deck.appendChild(deck.children[Math.floor(Math.random() * deck.children.length)]); 
-                deck.children[0].classList.add('active');
-            }, 80); 
-        }); 
-        
-        if(Date.now() < endTime) { setTimeout(loop, 120); } 
-        else { 
-            document.head.removeChild(fastStyle);
-            btn.disabled = false; btn.innerHTML = "ทำนาย"; 
-            try { shuffleAudio.pause(); shuffleAudio.currentTime = 0; } catch(e){}
-            setTimeout(() => { try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} }, 50);
-        } 
-    } 
-    loop(); 
-}
+function shuffleDeck(id){ try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} const deck = document.getElementById(id); if (!deck) return; const topCard = deck.children[0]; if (!topCard) return; topCard.classList.add('shuffling'); setTimeout(() => { topCard.classList.remove('shuffling'); deck.appendChild(topCard); deck.children[0].classList.add('active'); }, 200); }
+function predictAll(){ const btn = document.getElementById('btnPredict'); if(btn.disabled) return; btn.disabled = true; btn.innerHTML = "กำลังสื่อสาร..."; try { shuffleAudio.currentTime = 0; shuffleAudio.play(); } catch(e){} const fastStyle = document.createElement("style"); fastStyle.innerText = `.tarot-card { transition: transform 0.1s !important; } .shuffling { transform: translateX(100px) rotate(15deg) !important; }`; document.head.appendChild(fastStyle); const endTime = Date.now() + 2000; function loop(){ ['deckVillage','deckWolf','deckSpecial'].forEach(id => { const deck = document.getElementById(id); if(!deck) return; const topCard = deck.children[0]; if(!topCard) return; topCard.classList.add('shuffling'); setTimeout(() => { topCard.classList.remove('shuffling'); deck.appendChild(deck.children[Math.floor(Math.random() * deck.children.length)]); deck.children[0].classList.add('active'); }, 80); }); if(Date.now() < endTime) { setTimeout(loop, 120); } else { document.head.removeChild(fastStyle); btn.disabled = false; btn.innerHTML = "ทำนาย"; try { shuffleAudio.pause(); shuffleAudio.currentTime = 0; } catch(e){} setTimeout(() => { try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} }, 50); } } loop(); }
 
 // ================= 🏆 Win Dialogues ================= //
 const winMessages = {
     village: [
-        { title: "☀️ แสงรุ่งอรุณแห่งความหวัง", desc: "เหล่าอสูรร้ายถูกกำจัดจนสิ้นซาก ความสงบสุขกลับคืนสู่หมู่บ้านอีกครั้ง แม้จะต้องแลกมาด้วยหยาดน้ำตาและรอยเลือดของพ้องเพื่อนก็ตาม" },
-        { title: "🕊️ ความสงบที่แลกด้วยชีวิต", desc: "ควันไฟจากการประหารมอดดับลง เมื่อไม่มีเสียงหอนข่มขวัญอีกต่อไป ชาวเมืองที่เหลือรอดจึงสามารถหลับตาลงได้เต็มตาสักที ในหมู่บ้านที่เงียบเหงากว่าเดิม" },
-        { title: "🕯️ แสงเทียนที่ไม่มอดดับ", desc: "แม้จะสูญเสียผู้บริสุทธิ์ไปมากมาย แต่สุดท้ายมนุษยชาติก็เอาชนะสัญชาตญาณสัตว์ป่าได้สำเร็จ ความสามัคคีคืออาวุธที่ร้ายกาจที่สุดของพวกเรา" },
-        { title: "🛡️ ชัยชนะของผู้เสียสละ", desc: "หมู่บ้านพ้นจากเงื้อมมือมัจจุราชได้ด้วยความกล้าหาญของผู้ที่ยอมพลีชีพ บัดนี้วิญญาณของผู้ปกป้องสามารถพักผ่อนได้อย่างสงบสุขแล้ว" },
-        { title: "🌅 รุ่งเช้าที่ไร้เสียงโหยหวน", desc: "ความหวาดกลัวที่กัดกินหัวใจมาเนิ่นนานได้สิ้นสุดลงแล้ว ชาวบ้านร่วมกันเฉลิมฉลองชัยชนะเหนือความตายที่แฝงตัวอยู่ในเงามืด" },
-        { title: "⚖️ ความยุติธรรมเหนือเขี้ยวเล็บ", desc: "พวกเราเลือกความตายเพื่อปกป้องความอยู่รอด และวันนี้เราพิสูจน์แล้วว่า มนุษย์ผู้รวมใจกัน แข็งแกร่งกว่าอสูรที่กระหายเลือด" },
-        { title: "🤝 พลังแห่งมวลชน", desc: "แม้เราจะไร้พลังเวทมนตร์หรือคมเขี้ยว แต่เรามีกันและกัน ความเชื่อมั่นซึ่งกันและกันได้นำทางเราผ่านค่ำคืนที่โหดร้ายที่สุด" },
-        { title: "🌾 ผืนดินที่ได้รับการชำระ", desc: "เลือดของอสูรร้ายถูกชะล้างด้วยน้ำมือของมนุษย์ บัดนี้ผืนดินแห่งนี้บริสุทธิ์อีกครั้ง พร้อมสำหรับการเริ่มต้นใหม่ที่ไร้ซึ่งฝันร้าย" },
-        { title: "✨ แสงสว่างชนะความมืด", desc: "ค่ำคืนอันยาวนานสิ้นสุดลงแล้ว แสงแดดอันอบอุ่นแผ่ซ่านไปทั่วหมู่บ้าน ย้ำเตือนว่าความดีงามจะยังคงอยู่เสมอ" },
-        { title: "🏘️ หมู่บ้านที่เหลือเพียงเรา", desc: "ความสงบสุขกลับมาเยือน แต่ในหัวใจยังคงสลายไปด้วยความสูญเสีย เราจะจดจำชื่อของผู้ที่จากไปในฐานะวีรบุรุษของหมู่บ้าน" }
+        { title: "☀️ แสงรุ่งอรุณแห่งความหวัง", desc: "เหล่าอสูรร้ายถูกกำจัดจนสิ้นซาก ความสงบสุขกลับคืนสู่หมู่บ้านอีกครั้ง" },
+        { title: "🕊️ ความสงบที่แลกด้วยชีวิต", desc: "ควันไฟจากการประหารมอดดับลง เมื่อไม่มีเสียงหอนข่มขวัญ ชาวเมืองจึงหลับตาลงได้เต็มตาสักที" },
+        { title: "🕯️ แสงเทียนที่ไม่มอดดับ", desc: "แม้จะสูญเสียผู้บริสุทธิ์ไปมากมาย แต่สุดท้ายมนุษยชาติก็เอาชนะสัญชาตญาณสัตว์ป่าได้สำเร็จ" },
+        { title: "🛡️ ชัยชนะของผู้เสียสละ", desc: "หมู่บ้านพ้นจากเงื้อมมือมัจจุราชได้ด้วยความกล้าหาญ บัดนี้วิญญาณของผู้ปกป้องสามารถพักผ่อนได้อย่างสงบ" },
+        { title: "🌅 รุ่งเช้าที่ไร้เสียงโหยหวน", desc: "ความหวาดกลัวสิ้นสุดลง ชาวบ้านร่วมกันเฉลิมฉลองชัยชนะเหนือความตายที่แฝงตัวอยู่ในเงามืด" },
+        { title: "⚖️ ความยุติธรรมเหนือเขี้ยวเล็บ", desc: "เราพิสูจน์แล้วว่า มนุษย์ผู้รวมใจกัน แข็งแกร่งกว่าอสูรที่กระหายเลือด" },
+        { title: "🤝 พลังแห่งมวลชน", desc: "แม้เราจะไร้พลังเวทมนตร์หรือคมเขี้ยว ความเชื่อมั่นซึ่งกันและกันได้นำทางเราผ่านค่ำคืนที่โหดร้าย" },
+        { title: "🌾 ผืนดินที่ได้รับการชำระ", desc: "เลือดของอสูรร้ายถูกชะล้างด้วยน้ำมือมนุษย์ บัดนี้ผืนดินพร้อมสำหรับการเริ่มต้นใหม่" },
+        { title: "✨ แสงสว่างชนะความมืด", desc: "ค่ำคืนอันยาวนานสิ้นสุดลง แสงแดดอันอบอุ่นแผ่ซ่านไปทั่วหมู่บ้าน" },
+        { title: "🏘️ หมู่บ้านที่เหลือเพียงเรา", desc: "ความสงบสุขกลับมาเยือน แต่เราจะจดจำชื่อของผู้ที่จากไปในฐานะวีรบุรุษตลอดกาล" }
     ],
     wolf: [
-        { title: "🌑 รัตติกาลที่ไม่มีวันสิ้นสุด", desc: "เสียงหอนสุดท้ายดังระงมไปทั่วหุบเขา เมื่อมนุษย์ไม่อาจต้านทานคมเขี้ยวได้ หมู่บ้านนี้กลายเป็นทุ่งสังหารของฝูงหมาป่าโดยสมบูรณ์" },
-        { title: "🐺 เสียงหอนแห่งผู้ชนะ", desc: "ไม่มีใครเหลือรอดไปบอกเล่าความจริง รอยเลือดบนหิมะคือสิ่งสุดท้ายที่ยืนยันว่าที่นี่เคยมีมนุษย์อาศัยอยู่ บัดนี้มันคือบ้านของพวกเรา" },
-        { title: "🩸 หมู่บ้านสีเลือด", desc: "คมเขี้ยวแหลมคมได้ทำหน้าที่ของมันแล้ว กลิ่นคาวเลือดคละคลุ้งไปทั่วทุกหลังคาเรือน ช่างเป็นมื้อค่ำที่วิเศษที่สุดเท่าที่เคยมีมา" },
-        { title: "🌙 จันทร์ฉายเหนือซากศพ", desc: "แสงจันทร์สีเงินนวลตาเป็นพยานถึงงานเลี้ยงที่ยิ่งใหญ่ บัดนี้ความอ่อนแอของมนุษย์ถูกกำจัดทิ้งไป เหลือเพียงความแข็งแกร่งของผู้ล่าเท่านั้น" },
-        { title: "🐾 รอยเท้าอสูรบนกองกระดูก", desc: "ความพยายามที่จะดิ้นรนของพวกเจ้าช่างน่าขัน มนุษย์เป็นเพียงเหยื่อที่ถูกลิขิตมาให้เป็นอาหารของฝูงเราตั้งแต่ออกเดินทางแล้ว" },
-        { title: "💀 จุดจบของยุคสมัยมนุษย์", desc: "อารยธรรมที่สร้างมานับร้อยปีพังทลายลงในคืนเดียว บัดนี้สัตว์ป่าคือผู้กุมอำนาจ และจะไม่มีใครขวางทางพวกเราได้อีกต่อไป" },
-        { title: "🍗 งานเลี้ยงใต้อุ้งเท้า", desc: "เนื้อสดที่หวานหอมคือรางวัลของผู้ชนะ ความหวาดกลัวในดวงตาพวกเจ้าคือเครื่องเคียงที่อร่อยที่สุดสำหรับคืนนี้" },
-        { title: "🌫️ เงาที่กลืนกินแสงอาทิตย์", desc: "จะไม่มีพรุ่งนี้สำหรับหมู่บ้านนี้อีกต่อไป ความมืดได้ปกคลุมจิตวิญญาณทุกดวง และเราคือเจ้าของเงานั้นตลอดกาล" },
-        { title: "⛓️ พันธนาการแห่งสัญชาตญาณ", desc: "เสียงกรีดร้องคือเสียงเพลงประกอบความสำเร็จ กลิ่นคาวเลือดคืออิสรภาพที่พวกเราใฝ่หามาแสนนาน" },
-        { title: "🥀 ความตายในอ้อมกอดหมาป่า", desc: "อย่าร้องไห้เลยเจ้ามนุษย์ที่น่าสงสาร เพราะความตายด้วยคมเขี้ยวของเรา คือเกียรติสูงสุดที่เจ้าจะได้รับในฐานะอาหาร" }
+        { title: "🌑 รัตติกาลที่ไม่มีวันสิ้นสุด", desc: "เสียงหอนสุดท้ายดังระงมไปทั่วหุบเขา เมื่อมนุษย์ไม่อาจต้านทานคมเขี้ยวได้" },
+        { title: "🐺 เสียงหอนแห่งผู้ชนะ", desc: "ไม่มีใครเหลือรอดไปบอกเล่าความจริง รอยเลือดบนหิมะคือสิ่งสุดท้ายที่เหลืออยู่" },
+        { title: "🩸 หมู่บ้านสีเลือด", desc: "คมเขี้ยวแหลมคมได้ทำหน้าที่ของมันแล้ว กลิ่นคาวเลือดคละคลุ้งไปทั่วทุกหลังคาเรือน" },
+        { title: "🌙 จันทร์ฉายเหนือซากศพ", desc: "แสงจันทร์สีเงินเป็นพยานถึงงานเลี้ยงที่ยิ่งใหญ่ ความอ่อนแอของมนุษย์ถูกกำจัดทิ้งไป" },
+        { title: "🐾 รอยเท้าอสูรบนกองกระดูก", desc: "ความพยายามดิ้นรนช่างน่าขัน มนุษย์เป็นเพียงเหยื่อที่ถูกลิขิตมาให้เป็นอาหาร" },
+        { title: "💀 จุดจบของยุคสมัยมนุษย์", desc: "อารยธรรมพังทลายลงในคืนเดียว บัดนี้สัตว์ป่าคือผู้กุมอำนาจแต่เพียงผู้เดียว" },
+        { title: "🍗 งานเลี้ยงใต้อุ้งเท้า", desc: "เนื้อสดที่หวานหอมคือรางวัลของผู้ชนะ ความหวาดกลัวในดวงตาพวกเจ้าคือเครื่องเคียงที่อร่อยที่สุด" },
+        { title: "🌫️ เงาที่กลืนกินแสงอาทิตย์", desc: "จะไม่มีพรุ่งนี้สำหรับหมู่บ้านนี้อีกต่อไป ความมืดได้ปกคลุมจิตวิญญาณทุกดวง" },
+        { title: "⛓️ พันธนาการแห่งสัญชาตญาณ", desc: "เสียงกรีดร้องคือเสียงเพลงประกอบความสำเร็จ กลิ่นคาวเลือดคืออิสรภาพ" },
+        { title: "🥀 ความตายในอ้อมกอดหมาป่า", desc: "อย่าร้องไห้เลยมนุษย์ที่น่าสงสาร ความตายด้วยคมเขี้ยวของเราคือเกียรติสูงสุดของเจ้า" }
     ],
-    lone_wolf: [{ title: "🗡️ ผู้ทรยศเพียงหนึ่งเดียว", desc: "แผนการอันแยบยลสัมฤทธิ์ผล พี่น้องร่วมสายเลือดและชาวเมืองต่างกลายเป็นซากศพ เหลือเพียงเขาผู้เดียวที่ยืนหยัดอยู่บนกองภูเขาเลากา" }],
-    jester: [{ title: "🎭 เสียงหัวเราะของคนบ้า", desc: "พวกเจ้าช่างโง่เขลานัก! การประหารครั้งนี้คือสิ่งที่ข้าปรารถนาที่สุด ชัยชนะนี้เป็นของข้าแต่เพียงผู้เดียว!" }],
-    cult: [{ title: "👁️ บัญชาแห่งศาสดาหน้ามืด", desc: "ไม่มีความลับหรือความแค้นอีกต่อไป เพราะบัดนี้ทุกคนคือพี่น้องร่วมศรัทธา... จงก้มกราบแทบบาทศาสดา!" }],
-    thug: [{ title: "🩸 บัญชีเลือดถูกชำระ", desc: "เมื่อเหยื่อรายสุดท้ายสิ้นใจ ภารกิจลับของนักฆ่าไร้เงาก็เสร็จสิ้น เขาหายตัวไปในเงามืดพร้อมชัยชนะที่ไม่มีใครคาดคิด" }]
+    lone_wolf: [
+        { title: "🗡️ ผู้ทรยศเพียงหนึ่งเดียว", desc: "เหลือเพียงเขาผู้เดียวที่ยืนหยัดอยู่บนกองภูเขาเลากา" },
+        { title: "🐺 ราชาหมาป่าที่แท้จริง", desc: "ไม่ต้องมีฝูง ข้าก็คือผู้ล่าที่แข็งแกร่งที่สุดในป่านี้!" },
+        { title: "🩸 ชัยชนะบนซากศพพี่น้อง", desc: "การหักหลังคือความหอมหวาน บัดนี้ข้าคือหมาป่าตัวสุดท้าย" }
+    ],
+    jester: [
+        { title: "🎭 เสียงหัวเราะของคนบ้า", desc: "ชัยชนะนี้เป็นของข้าแต่เพียงผู้เดียว!" },
+        { title: "🃏 แผนลวงสมบูรณ์แบบ", desc: "พวกเจ้าช่างโง่เขลานักที่โหวตข้าออก สมใจอยากข้าล่ะ!" },
+        { title: "🎪 ผู้ชนะบนลานประหาร", desc: "เชือกแขวนคอเส้นนี้คือรางวัลที่ข้าเฝ้ารอมาตลอด!" }
+    ],
+    cult: [
+        { title: "👁️ บัญชาแห่งศาสดาหน้ามืด", desc: "จงก้มกราบแทบบาทศาสดา!" },
+        { title: "🪬 โลกใบใหม่ในกำมือ", desc: "ไม่มีใครต่อต้านศรัทธาของเราได้ ทุกคนคือสาวกของข้า!" },
+        { title: "🕯️ แสงสว่างจอมปลอม", desc: "พวกเจ้าถูกล้างสมองโดยสมบูรณ์ บัดนี้ลัทธิของเราคือผู้ปกครอง" }
+    ],
+    thug: [
+        { title: "🩸 บัญชีเลือดถูกชำระ", desc: "เขาหายตัวไปในเงามืดพร้อมชัยชนะที่ไม่มีใครคาดคิด" },
+        { title: "👊 หมัดเหล็กสั่งตาย", desc: "เป้าหมายทั้งหมดถูกส่งลงนรก ภารกิจของนักฆ่าสำเร็จแล้ว!" },
+        { title: "💰 รับเงินค่างวด", desc: "ไม่มีเป้าหมายไหนที่ข้าล็อกไว้แล้วจะรอดไปได้ งานนี้รับเละ!" }
+    ],
+    vampire: [
+        { title: "🧛🏻‍♀️ อาณาจักรแห่งรัตติกาล", desc: "ทุกหยดเลือดถูกสูบกินจนเหือดแห้ง บัดนี้มีเพียงแวมไพร์ที่เป็นอมตะเหนือทุกคน!" },
+        { title: "🍷 งานเลี้ยงโลหิต", desc: "เลือดของชาวบ้านและหมาป่าช่างหอมหวาน คืนนี้เป็นของพวกเราตลอดไป!" },
+        { title: "🦇 คืนชีพผู้เป็นอมตะ", desc: "ไม่มียาพิษหรือคมเขี้ยวใดทำลายพวกเราได้ อารยธรรมใหม่เริ่มต้นขึ้นแล้ว!" }
+    ]
 };
-
-function getRandomWinMessage(type) {
-    const messages = winMessages[type];
-    return messages[Math.floor(Math.random() * messages.length)];
-}
+function getRandomWinMessage(type) { return winMessages[type][Math.floor(Math.random() * winMessages[type].length)]; }
 
 // ================= ⚙️ Core Variables ================= //
 let groups=[], currentGroup=null, players=[];
 let nightKillTargets=[], nightGuardTarget=null, lastGuardTarget=null, elderSilenceTarget=null, cultRecruits=[], lovers=[], wolfBuff=false, wolfBuffUsed=false, gameLogs=[], thugTargets = [], hellHoundPartner = null, lastKilledByVote = null, isPrivacyMode = false;
-let dayCount = 0, minionCheckDone = false, witchUsed = false, witchAction = null, witchPoisonTarget = null, nightStep = 0;
+let dayCount = 0, minionCheckDone = false, witchAction = null, witchPoisonTarget = null, nightStep = 0;
+let witchUsed = false; // กลับมาใช้ขวดเดียว (One Potion Rule)
 let timerInterval = null, timeRemaining = 0, nominatedPlayer = null;
 let deadThisNight = [], silencedThisNight = [], secretLogs = [], deadThisVote = [];
 
-const roleNameTH={ villager:"🧑‍🌾 ชาวบ้าน", seer:"🔮 เทพพยากรณ์", witch:"🧪 แม่มด", cupid:"💘 กามเทพ", bodyguard:"🛡️ บอดี้การ์ด", pacifist:"🕊️ ผู้รักสันติ", fool:"🤪 ไอ้ทึ่ม", wolf:"🐺 หมาป่า", wolf_cub:"🐕 ลูกหมาป่า", jester:"🃏 ยาจก", wolf_human:"🌓 ลูกครึ่งมนุษย์หมาป่า", tough_guy:"🏋️ หนุ่มถึก", elder:"👵 แม่เฒ่า", minion:"👺 สมุนรับใช้", cult_leader:"🪬 เจ้าลัทธิ", lone_wolf:"🌑 หมาป่าเดียวดาย", thug:"👊 อันธพาล", hell_hound:"🔥 หมาป่าโลกันตร์" };
-const uniqueRoles = ['seer', 'witch', 'cupid', 'bodyguard', 'elder', 'jester', 'cult_leader', 'thug', 'lone_wolf', 'hell_hound'];
-const roleBalanceValues = { villager: 1, seer: 7, witch: 3, cupid: -3, bodyguard: 3, pacifist: -2, fool: 2, wolf: -6, wolf_cub: -8, jester: -2, wolf_human: -1, tough_guy: 3, elder: 1, minion: -6, cult_leader: 1, lone_wolf: -5, thug: 0, hell_hound: -4 };
+let priestBlessedTarget = null, priestSetupDone = false;
+let wolvesSick = false, makeWolvesSickNextNight = false;
+let masonCheckDone = false, thugSetupDone = false; 
+let vampireKillTarget = null;
+let pendingHunters = [], hunterCallback = null, currentHunterIndex = null, selectedHunterTarget = null;
+
+const uniqueRoles = ['seer', 'witch', 'cupid', 'bodyguard', 'elder', 'jester', 'cult_leader', 'thug', 'lone_wolf', 'hell_hound', 'prince', 'hunter', 'priest', 'sick', 'cursed', 'drunk', 'wolf_man', 'vampire'];
+const roleBalanceValues = { villager: 1, seer: 7, witch: 3, cupid: -3, bodyguard: 3, pacifist: -2, fool: 2, prince: 3, hunter: 3, priest: 3, sick: 3, mason: 2, cursed: -3, drunk: 4, wolf: -6, wolf_cub: -8, jester: -2, wolf_human: -1, tough_guy: 3, elder: 1, minion: -6, cult_leader: 1, lone_wolf: -5, thug: 0, hell_hound: -4, wolf_man: -9, vampire: -7 };
 
 function save(){ localStorage.setItem("groups_v5", JSON.stringify(groups)); }
 function load(){ groups = JSON.parse(localStorage.getItem("groups_v5") || "[]"); renderGroups(); }
+function addLog(msg, isHeader = false){ const time = new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}); const logMsg = isHeader ? `<div class="log-header">${msg}</div>` : `<div>[${time}] ${msg}</div>`; gameLogs.push(logMsg); document.getElementById("gameLog").innerHTML = [...gameLogs].reverse().join(""); }
+function calculateBalance() { let score = 0; players.forEach(p => score += roleBalanceValues[p.role] || 0); document.getElementById("totalBalanceScore").innerText = score > 0 ? "+" + score : score; }
+function createGroup(){ const name = groupName.value; if(!name) return; groups.push({name: name, players: []}); save(); renderGroups(); groupName.value = ""; }
+function createTestGroup() { const testPlayers = Object.keys(roleNameTH).slice(0,23).map(roleKey => ({ name: roleNameTH[roleKey].split(" ")[1], role: roleKey, alive: true, isCult: false, silenced: false, toughGuyBleeding: false })); groups.push({name: "ห้องทดสอบแบบเต็ม", players: testPlayers}); save(); renderGroups(); }
+function deleteGroup(i) { if(confirm(`คุณต้องการลบกลุ่ม "${groups[i].name}" ใช่หรือไม่?`)) { groups.splice(i, 1); save(); renderGroups(); } }
 
-function addLog(msg, isHeader = false){ 
-    const time = new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}); 
-    const logMsg = isHeader ? `<div class="log-header">${msg}</div>` : `<div>[${time}] ${msg}</div>`; 
-    gameLogs.push(logMsg); 
-    document.getElementById("gameLog").innerHTML = [...gameLogs].reverse().join(""); 
-}
-
-function calculateBalance() { 
-    let score = 0; 
-    players.forEach(p => score += roleBalanceValues[p.role] || 0); 
-    document.getElementById("totalBalanceScore").innerText = score > 0 ? "+" + score : score; 
-}
-
-function createGroup(){ 
-    const name = groupName.value; 
-    if(!name) return; 
-    groups.push({name: name, players: []}); 
-    save(); renderGroups(); groupName.value = ""; 
-}
-
-function createTestGroup() { 
-    const name = "ห้องทดสอบระบบ"; 
-    const testPlayers = Object.keys(roleNameTH).map(roleKey => ({ 
-        name: roleNameTH[roleKey].split(" ")[1], 
-        role: roleKey, alive: true, isCult: (roleKey === 'cult_leader'), silenced: false, toughGuyBleeding: false 
-    })); 
-    groups.push({name: name, players: testPlayers}); 
-    save(); renderGroups(); 
-}
-
-// ================= ฟังก์ชันลบกลุ่มใหม่ ================= //
-function deleteGroup(i) {
-    if(confirm(`คุณต้องการลบกลุ่ม "${groups[i].name}" ใช่หรือไม่?`)) {
-        groups.splice(i, 1);
-        save();
-        renderGroups();
-    }
-}
-
-// ================= ปรับปรุง UI หน้าแรก (ใช้คลาส group-card ใหม่) ================= //
 function renderGroups(){ 
     groupList.innerHTML = groups.map((g, i) => `
         <div class="group-card">
             <b style="font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:white;">📁 ${g.name}</b>
             <button class="primary" style="padding: 8px 16px; font-size:14px;" onclick="openGroup(${i})">เข้า</button>
-            <button class="danger" style="padding: 8px 12px; font-size:14px;" onclick="deleteGroup(${i})">ลบ</button>
+            <button class="danger" style="padding: 8px 12px; font-size:14px; color:white;" onclick="deleteGroup(${i})">ลบ</button>
         </div>`).join(""); 
 }
-
-function openGroup(i){ 
-    currentGroup = i; 
-    players = JSON.parse(JSON.stringify(groups[i].players || [])); 
-    document.getElementById("groupScreen").classList.add("hidden"); 
-    document.getElementById("setupScreen").classList.remove("hidden"); 
-    renderSetup(); 
-}
-
-function backToGroup(){ 
-    groups[currentGroup].players = players; 
-    save(); 
-    document.getElementById("setupScreen").classList.add("hidden"); 
-    document.getElementById("groupScreen").classList.remove("hidden"); 
-}
-
-function addPlayer(){ 
-    players.push({name:"ผู้เล่น "+(players.length+1), role:"villager", alive:true, isCult:false, silenced:false, toughGuyBleeding:false}); 
-    renderSetup(); 
-}
-
+function openGroup(i){ currentGroup = i; players = JSON.parse(JSON.stringify(groups[i].players || [])); document.getElementById("groupScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); renderSetup(); }
+function backToGroup(){ groups[currentGroup].players = players; save(); document.getElementById("setupScreen").classList.add("hidden"); document.getElementById("groupScreen").classList.remove("hidden"); }
+function addPlayer(){ players.push({name:"ผู้เล่น "+(players.length+1), role:"villager", alive:true, isCult:false, silenced:false, toughGuyBleeding:false}); renderSetup(); }
 function removePlayer(i){ players.splice(i, 1); renderSetup(); }
-
-function handleRoleChange(index, newRole) { 
-    if (uniqueRoles.includes(newRole) && players.some((p, i) => i !== index && p.role === newRole)) { 
-        alert(`บทบาท ${roleNameTH[newRole]} มีได้เพียงคนเดียว!`); 
-        renderSetup(); return; 
-    } 
-    players[index].role = newRole; calculateBalance(); 
-}
+function handleRoleChange(index, newRole) { if (uniqueRoles.includes(newRole) && players.some((p, i) => i !== index && p.role === newRole)) { alert(`บทบาท ${getRoleName(newRole)} มีได้เพียงคนเดียว!`); renderSetup(); return; } players[index].role = newRole; calculateBalance(); }
 
 function renderSetup(){ 
     setupPlayers.innerHTML = players.map((p, i) => `
@@ -456,411 +413,310 @@ function renderSetup(){
             <b style="color:var(--primary)">${i+1}</b> 
             <input value="${p.name}" onchange="players[${i}].name=this.value"> 
             <select onchange="handleRoleChange(${i}, this.value)"> 
-                <optgroup label="ชาวบ้าน">${['villager','seer','witch','bodyguard','cupid','pacifist','fool','tough_guy','elder','wolf_human'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${roleNameTH[k]}</option>`).join("")}</optgroup> 
-                <optgroup label="หมาป่า">${['wolf','wolf_cub','minion','hell_hound'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${roleNameTH[k]}</option>`).join("")}</optgroup> 
-                <optgroup label="อื่นๆ">${['jester','cult_leader','thug','lone_wolf'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${roleNameTH[k]}</option>`).join("")}</optgroup> 
+                <optgroup label="ชาวบ้าน">${['villager','seer','witch','bodyguard','cupid','pacifist','fool','prince','hunter','priest','sick','mason','tough_guy','elder','wolf_human'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${getRoleName(k)}</option>`).join("")}</optgroup> 
+                <optgroup label="หมาป่า">${['wolf','wolf_cub','minion','hell_hound','wolf_man'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${getRoleName(k)}</option>`).join("")}</optgroup> 
+                <optgroup label="อื่นๆ">${['jester','cult_leader','thug','lone_wolf','cursed','drunk','vampire'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${getRoleName(k)}</option>`).join("")}</optgroup> 
             </select> 
-            <button class="danger" style="background:transparent;" onclick="removePlayer(${i})">ลบ</button> 
+            <button class="danger" style="background:transparent; color:white;" onclick="removePlayer(${i})">ลบ</button> 
         </div>`).join(""); 
     calculateBalance(); 
 }
 
-function togglePrivacy() { 
-    isPrivacyMode = !isPrivacyMode; 
-    document.getElementById("gamePlayers").className = isPrivacyMode ? "role-hidden" : ""; 
-    document.getElementById("togglePrivacy").innerText = isPrivacyMode ? "👁️ แสดงบท" : "👁️ ซ่อนบท"; 
-    renderGame(); 
-}
+function togglePrivacy() { isPrivacyMode = !isPrivacyMode; document.getElementById("gamePlayers").className = isPrivacyMode ? "role-hidden" : ""; document.getElementById("togglePrivacy").innerText = isPrivacyMode ? "👁️ แสดงบท" : "👁️ ซ่อนบท"; renderGame(); }
 
-// ================= 🚀 Game Logic ================= //
 function startGame(){
     if(players.length < 3){ alert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
-    
+    // Reset all statuses, making sure cult_leader gets the cult mark correctly at start
     players.forEach(p => { p.alive = true; p.toughGuyBleeding = false; p.silenced = false; p.isCult = (p.role === 'cult_leader'); });
-    lovers = []; lastGuardTarget = null; gameLogs = []; wolfBuff = false; wolfBuffUsed = false; thugTargets = []; hellHoundPartner = null; lastKilledByVote = null; dayCount = 1; minionCheckDone = false; witchUsed = false;
-    
-    addLog("--- เริ่มต้นเกม ---"); 
-    addLog(`เช้าวันที่ ${dayCount}`, true);
-    
-    try { bgmAudio.currentTime = 0; bgmAudio.play(); } catch(e){}
-    document.getElementById('floatingAudio').classList.remove('hidden');
-    
-    document.getElementById("setupScreen").classList.add("hidden");
-    document.getElementById("gameScreen").classList.remove("hidden");
-    
+    lovers = []; lastGuardTarget = null; gameLogs = []; wolfBuff = false; wolfBuffUsed = false; thugTargets = []; hellHoundPartner = null; lastKilledByVote = null; dayCount = 1; minionCheckDone = false;
+    witchUsed = false; witchAction = null; witchPoisonTarget = null; vampireKillTarget = null;
+    priestBlessedTarget = null; priestSetupDone = false; wolvesSick = false; pendingHunters = []; masonCheckDone = false; thugSetupDone = false; makeWolvesSickNextNight = false; deadThisVote = [];
+
+    addLog("--- เริ่มต้นเกม ---"); addLog(`เช้าวันที่ ${dayCount}`, true);
+    try { bgmAudio.currentTime = 0; bgmAudio.play(); } catch(e){} document.getElementById('floatingAudio').classList.remove('hidden');
+    document.getElementById("setupScreen").classList.add("hidden"); document.getElementById("gameScreen").classList.remove("hidden");
     runInitialPhases();
 }
 
 function runInitialPhases(){
-    const timerPanel = document.getElementById("dayTimerPanel");
-    const btnNight = document.getElementById("btnStartNight");
-    if(timerPanel) timerPanel.classList.add("hidden");
-    if(btnNight) btnNight.classList.add("hidden");
-
-    if(players.some(p => p.role === "minion") && !minionCheckDone) {
-        renderMinionCheck();
-    } else if(players.some(p => p.role === "cupid") && lovers.length === 0) {
-        renderCupid();
-    } else if(players.some(p => p.role === "thug") && thugTargets.length === 0) {
-        renderThugSelect();
-    } else if(players.some(p => p.role === "hell_hound") && hellHoundPartner === null) {
-        renderHellHoundSelect();
-    } else { 
-        if(timerPanel) timerPanel.classList.remove("hidden"); 
-        if(btnNight) btnNight.classList.remove("hidden"); 
-        renderGame(); 
-    }
+    const timerPanel = document.getElementById("dayTimerPanel"); const btnNight = document.getElementById("btnStartNight");
+    if(timerPanel) timerPanel.classList.add("hidden"); if(btnNight) btnNight.classList.add("hidden");
+    
+    if(players.some(p => p.role === "minion") && !minionCheckDone) renderMinionCheck();
+    else if(players.some(p => p.role === "mason") && !masonCheckDone) renderMasonCheck();
+    else if(players.some(p => p.role === "cupid") && lovers.length === 0) renderCupid();
+    else if(players.some(p => p.role === "priest") && !priestSetupDone) renderPriestSelect();
+    else if(players.some(p => p.role === "thug") && !thugSetupDone) renderThugSelect();
+    else if(players.some(p => p.role === "hell_hound") && hellHoundPartner === null) renderHellHoundSelect();
+    else { if(timerPanel) timerPanel.classList.remove("hidden"); if(btnNight) btnNight.classList.remove("hidden"); renderGame(); }
 }
 
-// ================= 🛠️ Special Roles ================= //
-function renderMinionCheck() { 
-    const wolves = players.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf'].includes(p.role)).map(p => p.name); 
-    gamePlayers.innerHTML = `
-        <div class="glass-panel">
-            <div class="gm-script">สมุนรับใช้: ตรวจสอบรายชื่อหมาป่า</div>
-            <p style="text-align:center; font-size:20px; color:var(--danger); font-weight:bold;">${wolves.join(", ") || 'ไม่มี'}</p>
-            <button class="primary" style="width:100%; margin-top:20px;" onclick="minionCheckDone=true; runInitialPhases()">รับทราบและถัดไป</button>
-        </div>`; 
+function renderMinionCheck() { const wolves = players.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role)).map(p => p.name); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'สมุนรับใช้' : 'Minion'}: ตรวจสอบรายชื่อหมาป่า</div><p style="text-align:center; font-size:20px; color:var(--danger); font-weight:bold;">${wolves.join(", ") || 'ไม่มี'}</p><button class="primary" style="width:100%; margin-top:20px;" onclick="minionCheckDone=true; runInitialPhases()">รับทราบและถัดไป</button></div>`; }
+function renderMasonCheck() { const masons = players.filter(p => p.role === 'mason').map(p => p.name); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'ภราดรแห่งเมสัน' : 'Masons'}: ลืมตาเพื่อยืนยันตัวตน</div><p style="text-align:center; font-size:20px; color:var(--success); font-weight:bold;">${masons.join(", ") || 'ไม่มี'}</p><button class="primary" style="width:100%; margin-top:20px;" onclick="masonCheckDone=true; runInitialPhases()">รับทราบและถัดไป</button></div>`; }
+function toggleLover(index) { if (lovers.includes(index)) { lovers = lovers.filter(x => x !== index); } else if (lovers.length < 2) { lovers.push(index); } renderCupid(); }
+function renderCupid(){ let btns = players.map((p,i) => `<button class="ghost" style="${lovers.includes(i) ? 'background: var(--lovers-pink); color: white; border: 2px solid white;' : ''}" onclick="toggleLover(${i})">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'กามเทพ' : 'Cupid'}: เลือกคู่รัก 2 คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px; background:var(--lovers-pink);" onclick="if(lovers.length==2) runInitialPhases()">ยืนยันเป้าหมาย</button></div>`; }
+function renderPriestSelect(){ let btns = players.map((p,i) => p.role === 'priest' ? '' : `<button class="ghost" style="${priestBlessedTarget === i ? 'background: var(--warning); color: black; border: 2px solid white;' : ''}" onclick="priestBlessedTarget=${i}; renderPriestSelect();">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'นักบวช' : 'Priest'}: เลือกมอบพรคุ้มครองการโหวตให้ 1 คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px;" onclick="priestSetupDone=true; try{ blessAudio.currentTime = 0; blessAudio.play(); }catch(e){}; runInitialPhases()">${currentLang === 'TH' ? 'ยืนยันเป้าหมาย' : 'Confirm'}</button></div>`; }
+function toggleThugTarget(index, max) { if (thugTargets.includes(index)) { thugTargets = thugTargets.filter(x => x !== index); } else if (thugTargets.length < max) { thugTargets.push(index); } renderThugSelect(); }
+function renderThugSelect(){ 
+    const max = players.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role)).length; 
+    let btns = players.map((p,i) => p.role === 'thug' ? '' : `<button class="ghost" style="${thugTargets.includes(i) ? 'background: var(--thug); color: white; border: 2px solid white;' : ''}" onclick="toggleThugTarget(${i}, ${max})">${p.name}</button>`).join(""); 
+    gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'อันธพาล' : 'Thug'}: เลือกเป้าหมาย ${max} คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px; background:var(--thug);" onclick="if(thugTargets.length==${max} || ${max}===0) { thugSetupDone=true; runInitialPhases(); }">ยืนยันเป้าหมาย</button></div>`; 
 }
+function renderHellHoundSelect(){ let btns = players.map((p,i) => p.role === 'hell_hound' ? '' : `<button class="ghost" style="${hellHoundPartner === i ? 'background: var(--danger); color: white; border: 2px solid white;' : ''}" onclick="hellHoundPartner=${i}; renderHellHoundSelect();">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'หมาป่าโลกันตร์' : 'Hell Hound'}: เลือกคู่ชีวิตลับ</div><div class="game-grid">${btns}</div><button class="danger" style="width:100%; margin-top:20px; color:white;" onclick="if(hellHoundPartner!==null) runInitialPhases()">ยืนยันเป้าหมาย</button></div>`; }
 
-function toggleLover(index) {
-    if (lovers.includes(index)) { lovers = lovers.filter(x => x !== index); } 
-    else if (lovers.length < 2) { lovers.push(index); }
-    renderCupid();
-}
-function renderCupid(){
-    let btns = players.map((p,i) => {
-        const style = lovers.includes(i) ? 'background: var(--lovers-pink); color: white; border: 2px solid white;' : '';
-        return `<button class="ghost" style="${style}" onclick="toggleLover(${i})">${p.name}</button>`;
-    }).join("");
-    gamePlayers.innerHTML = `
-        <div class="glass-panel">
-            <div class="gm-script">กามเทพ: เลือกคู่รัก 2 คน</div>
-            <div class="game-grid">${btns}</div>
-            <button class="primary" style="width:100%; margin-top:20px; background:var(--lovers-pink);" onclick="if(lovers.length==2) runInitialPhases()">ยืนยันเป้าหมาย</button>
-        </div>`;
-}
-
-function toggleThugTarget(index, max) {
-    if (thugTargets.includes(index)) { thugTargets = thugTargets.filter(x => x !== index); } 
-    else if (thugTargets.length < max) { thugTargets.push(index); }
-    renderThugSelect();
-}
-function renderThugSelect(){
-    const max = players.filter(p => ['wolf','wolf_cub','hell_hound'].includes(p.role)).length;
-    let btns = players.map((p,i) => {
-        if(p.role === 'thug') return '';
-        const style = thugTargets.includes(i) ? 'background: var(--thug); color: white; border: 2px solid white;' : '';
-        return `<button class="ghost" style="${style}" onclick="toggleThugTarget(${i}, ${max})">${p.name}</button>`;
-    }).join("");
-    gamePlayers.innerHTML = `
-        <div class="glass-panel">
-            <div class="gm-script">อันธพาล: เลือกเป้าหมาย ${max} คน</div>
-            <div class="game-grid">${btns}</div>
-            <button class="primary" style="width:100%; margin-top:20px; background:var(--thug);" onclick="if(thugTargets.length==${max}) runInitialPhases()">ยืนยันเป้าหมาย</button>
-        </div>`;
-}
-
-function renderHellHoundSelect(){
-    let btns = players.map((p,i) => {
-        if(p.role === 'hell_hound') return '';
-        const style = hellHoundPartner === i ? 'background: var(--danger); color: white; border: 2px solid white;' : '';
-        return `<button class="ghost" style="${style}" onclick="hellHoundPartner=${i}; renderHellHoundSelect();">${p.name}</button>`;
-    }).join("");
-    gamePlayers.innerHTML = `
-        <div class="glass-panel">
-            <div class="gm-script">หมาป่าโลกันตร์: เลือกคู่ชีวิตลับ</div>
-            <div class="game-grid">${btns}</div>
-            <button class="danger" style="width:100%; margin-top:20px;" onclick="if(hellHoundPartner!==null) runInitialPhases()">ยืนยันเป้าหมาย</button>
-        </div>`;
-}
-
-// ================= ⏱️ Timer Logic ================= //
 function startCustomTimer() {
-    if(document.activeElement) document.activeElement.blur();
-
-    const minVal = document.getElementById('timerMins').value;
-    const secVal = document.getElementById('timerSecs').value;
-    let t = (parseInt(minVal) || 0) * 60 + (parseInt(secVal) || 0);
-    
-    if(t <= 0) { 
-        alert("⚠️ กรุณาระบุเวลาให้ถูกต้องก่อนเริ่มจับเวลาครับ"); 
-        document.getElementById('timerMins').value = 3;
-        document.getElementById('timerSecs').value = 0;
-        return; 
-    }
-    
-    if(!isPrivacyMode) togglePrivacy(); 
-    document.getElementById('fullScreenTimer').classList.add('active');
-    
-    clearInterval(timerInterval); 
-    timeRemaining = t;
-    updateTimerDisp();
-    
-    try { alarmAudio.play().then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; }).catch(e => {}); } catch(e){}
-    
-    timerInterval = setInterval(() => { 
-        timeRemaining--; 
-        if(timeRemaining <= 0) {
-            clearInterval(timerInterval); 
-            try { alarmAudio.play(); } catch(e){} 
-        } 
-        updateTimerDisp(); 
-    }, 1000);
+    if(document.activeElement) document.activeElement.blur(); const minVal = document.getElementById('timerMins').value; const secVal = document.getElementById('timerSecs').value; let t = (parseInt(minVal) || 0) * 60 + (parseInt(secVal) || 0);
+    if(t <= 0) { alert("⚠️ กรุณาระบุเวลาให้ถูกต้องก่อนเริ่มจับเวลาครับ"); document.getElementById('timerMins').value = 3; return; }
+    if(!isPrivacyMode) togglePrivacy(); document.getElementById('fullScreenTimer').classList.add('active'); clearInterval(timerInterval); timeRemaining = t; updateTimerDisp(); try { alarmAudio.play().then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; }).catch(e => {}); } catch(e){}
+    timerInterval = setInterval(() => { timeRemaining--; if(timeRemaining <= 0) { clearInterval(timerInterval); try { alarmAudio.play(); } catch(e){} } updateTimerDisp(); }, 1000);
 }
+function stopCustomTimer() { clearInterval(timerInterval); document.getElementById('fullScreenTimer').classList.remove('active'); try { alarmAudio.pause(); alarmAudio.currentTime = 0; } catch(e){} }
+function updateTimerDisp() { const m = Math.floor(Math.max(timeRemaining, 0) / 60).toString().padStart(2,'0'); const s = (Math.max(timeRemaining, 0) % 60).toString().padStart(2,'0'); document.getElementById("massiveTimerDisplay").innerText = `${m}:${s}`; document.getElementById("massiveTimerDisplay").style.color = timeRemaining <= 0 ? "var(--danger)" : "white"; }
 
-function stopCustomTimer() { 
-    clearInterval(timerInterval); 
-    document.getElementById('fullScreenTimer').classList.remove('active'); 
-    try { alarmAudio.pause(); alarmAudio.currentTime = 0; } catch(e){} 
-}
-
-function updateTimerDisp() { 
-    const m = Math.floor(Math.max(timeRemaining, 0) / 60).toString().padStart(2,'0');
-    const s = (Math.max(timeRemaining, 0) % 60).toString().padStart(2,'0'); 
-    const display = document.getElementById("massiveTimerDisplay");
-    display.innerText = `${m}:${s}`; 
-    if (timeRemaining <= 0) { display.style.color = "var(--danger)"; } else { display.style.color = "white"; }
-}
-
-// ================= ⚖️ Execution ================= //
-function nominate(i) { 
-    nominatedPlayer = i; 
-    document.getElementById("trialPlayerName").innerText = players[i].name; 
-    document.getElementById("trialModal").classList.add("active"); 
-}
-
+function nominate(i) { nominatedPlayer = i; document.getElementById("trialPlayerName").innerText = players[i].name; document.getElementById("trialModal").classList.add("active"); }
 function closeTrial() { document.getElementById("trialModal").classList.remove("active"); }
 
 function verdict(isGuilty) {
-    if(!isGuilty) { 
-        addLog(`${players[nominatedPlayer].name} ได้รับการปล่อยตัว`); 
-        closeTrial(); 
-        renderGame();
-        return; 
+    if(!isGuilty) { addLog(`${players[nominatedPlayer].name} ได้รับการปล่อยตัว`); closeTrial(); renderGame(); return; }
+    const i = nominatedPlayer; deadThisVote = []; 
+    
+    // 🎧 เสียงเคาะบัลลังก์ศาล ป๊อกๆ
+    try { gavelAudio.currentTime = 0; gavelAudio.play(); } catch(e){} 
+
+    if(priestBlessedTarget === i) {
+        addLog(`✞ ปาฏิหาริย์! พรนักบวชคุ้มครอง ${players[i].name}`);
+        alert(`ปาฏิหาริย์! ${players[i].name} ได้รับพรจากนักบวช เขารอดชีวิตจากการประหารครั้งนี้!`);
+        priestBlessedTarget = null; 
+        closeTrial(); renderGame(); return;
     }
     
-    const i = nominatedPlayer;
-    if(players[i].role === 'fool') { 
-        addLog(`🤪 ${players[i].name} เปิดเผยตัวว่าเป็น "ไอ้ทึ่ม" รอดจากการถูกแขวนคอ!`); 
-        alert(`เซอร์ไพรส์! ${players[i].name} คือไอ้ทึ่ม! เขาจะรอดชีวิตจากการแขวนคอครั้งนี้!`);
-        players[i].role = 'villager';
-        closeTrial(); 
-        renderGame(); 
-        return; 
+    if(players[i].role === 'fool') addLog(`🤪 ${players[i].name} ไอ้ทึ่มถูกแขวนคอแล้ว!`); 
+    
+    if(players[i].role === 'prince') { 
+        addLog(`👑 ${players[i].name} เปิดเผยตัวว่าเป็น "เจ้าชาย" รอดจากการถูกประหาร!`); 
+        alert(`ประกาศราชโองการ! ${players[i].name} คือเจ้าชาย! เขาจะรอดชีวิตจากการประหารครั้งนี้!`); 
+        players[i].role = 'villager'; 
+        closeTrial(); renderGame(); return; 
     }
     
-    deadThisVote = [players[i].name]; 
-    players[i].alive = false; 
+    deadThisVote.push(players[i].name); players[i].alive = false; lastKilledByVote = i; 
+    addLog(`${players[i].name} ถูกลงทัณฑ์แขวนคอ`);
     if(players[i].role === 'wolf_cub') wolfBuff = true; 
     
-    lastKilledByVote = i; 
-    addLog(`${players[i].name} ถูกลงทัณฑ์แขวนคอ`);
-    
+    if(players[i].role === 'hunter' && !pendingHunters.includes(i)) pendingHunters.push(i);
     checkDeathLinks(i, false); 
     closeTrial();
     
-    if(deadThisVote.length > 1) { 
-        document.getElementById("dayDeathSummary").innerHTML = deadThisVote.map(n => `💀 ${n}`).join("<br>"); 
-        document.getElementById("dayDeathModal").classList.add("active"); 
+    if(pendingHunters.length > 0) {
+        processPendingHunters(() => {
+            if(deadThisVote.length > 1) { document.getElementById("dayDeathSummary").innerHTML = deadThisVote.map(n => `💀 ${n}`).join("<br>"); document.getElementById("dayDeathModal").classList.add("active"); } 
+            else { if(!checkWinCondition()) renderGame(); }
+        });
     } else {
-        if(!checkWinCondition()) renderGame();
+        if(deadThisVote.length > 1) { document.getElementById("dayDeathSummary").innerHTML = deadThisVote.map(n => `💀 ${n}`).join("<br>"); document.getElementById("dayDeathModal").classList.add("active"); } 
+        else { if(!checkWinCondition()) renderGame(); }
     }
 }
+function closeDayDeathModal() { document.getElementById("dayDeathModal").classList.remove("active"); if(!checkWinCondition()) renderGame(); }
 
-function closeDayDeathModal() { 
-    document.getElementById("dayDeathModal").classList.remove("active"); 
-    if(!checkWinCondition()) renderGame(); 
+// ================= 🏹 Hunter Logic ================= //
+function processPendingHunters(callback) {
+    if (callback) hunterCallback = callback;
+    if (pendingHunters.length === 0) { document.getElementById("hunterModal").classList.remove("active"); if (hunterCallback) hunterCallback(); return; }
+    
+    currentHunterIndex = pendingHunters.shift(); selectedHunterTarget = null;
+    document.getElementById("hunterShooterName").innerText = players[currentHunterIndex].name;
+    updateHunterModalUI();
+    document.getElementById("hunterModal").classList.add("active");
+    try { reloadAudio.currentTime = 0; reloadAudio.play(); } catch(e){} // 🎧 เสียงชักปืน
+}
+function updateHunterModalUI() {
+    let html = players.map((p, i) => {
+        if (!p.alive) return '';
+        let sel = (selectedHunterTarget === i);
+        return `<button class="ghost ${sel ? 'selected-card' : ''}" style="padding:10px; ${sel ? 'border-color:var(--danger)' : ''}" onclick="selectedHunterTarget=${i}; updateHunterModalUI();">${p.name}</button>`;
+    }).join("");
+    document.getElementById("hunterTargets").innerHTML = html + `<button class="danger" style="width:100%; margin-top:15px; font-size:18px; padding:12px; color:white;" onclick="fireHunterShot()">ยิงเป้าหมาย!</button>`;
+}
+function fireHunterShot() {
+    if (selectedHunterTarget === null) return;
+    try { gunshotAudio.currentTime = 0; gunshotAudio.play(); } catch(e){} // 🎧 เสียงยิงปืน
+    let t = selectedHunterTarget;
+    players[t].alive = false;
+    addLog(`🏹 ${players[currentHunterIndex].name} ยิง ${players[t].name} ตายตามไป!`);
+    alert(`ฉึก! ${players[currentHunterIndex].name} ลั่นศรยิง ${players[t].name} ตายตกไปตามกัน!`);
+    deadThisVote.push(players[t].name); 
+    
+    if(players[t].role === 'wolf_cub') wolfBuff = true; 
+    if(players[t].role === 'hunter' && !pendingHunters.includes(t)) pendingHunters.push(t);
+    checkDeathLinks(t, false);
+    
+    if(checkWinCondition()) return;
+    processPendingHunters(); 
 }
 
-// ================= 🌙 Night Logic ================= //
 function startNight() { 
-    try { wolfAudio.play(); } catch(e){} 
-    stopCustomTimer();
+    try { wolfAudio.play(); } catch(e){} stopCustomTimer(); document.getElementById("dayTimerPanel").classList.add("hidden"); document.getElementById("btnStartNight").classList.add("hidden");
+    deadThisNight = []; silencedThisNight = []; secretLogs = []; deadThisVote = []; dayCount++; addLog(`คืนวันที่ ${dayCount - 1}`, true); nightStep = 0; nightKillTargets = []; nightGuardTarget = null; elderSilenceTarget = null; cultRecruits = []; lastKilledByVote = null; makeWolvesSickNextNight = false;
     
-    const timerPanel = document.getElementById("dayTimerPanel");
-    const btnNight = document.getElementById("btnStartNight");
-    if(timerPanel) timerPanel.classList.add("hidden");
-    if(btnNight) btnNight.classList.add("hidden");
+    witchAction = null; witchPoisonTarget = null; vampireKillTarget = null;
     
-    deadThisNight = []; silencedThisNight = []; secretLogs = [];
-    dayCount++;
-    addLog(`คืนวันที่ ${dayCount - 1}`, true); 
+    if (dayCount - 1 === 3) {
+        let drunkSobered = false;
+        players.forEach(p => {
+            if (p.role === 'drunk' && p.alive) {
+                drunkSobered = true;
+                const drunkRoles = ['vampire', 'hunter', 'wolf', 'villager', 'villager', 'villager', 'hunter'];
+                const newRole = drunkRoles[Math.floor(Math.random() * drunkRoles.length)];
+                p.role = newRole;
+                alert(`🍺 คนขี้เมา (${p.name}) สร่างเมาแล้ว!\nบทบาทที่แท้จริงคือ: ${getRoleName(newRole)}`);
+                addLog(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
+                secretLogs.push(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
+            }
+        });
+        if (drunkSobered) {
+            try { hiccupAudio.currentTime = 0; hiccupAudio.play(); } catch(e){} // 🎧 เสียงเรอคนขี้เมา
+        }
+    }
     
-    nightStep = 0; 
-    nightKillTargets = []; 
-    nightGuardTarget = null; 
-    elderSilenceTarget = null; 
-    cultRecruits = [];
-    lastKilledByVote = null;
-    
-    players.forEach(p => p.silenced = false); 
-    runNight(); 
+    players.forEach(p => p.silenced = false); runNight(); 
 }
 
-function runNight() { 
-    const order = ["wolf", "seer", "bodyguard", "witch", "elder", "cult_leader"]; 
-    if(nightStep < order.length) {
-        renderNightRole(order[nightStep]); 
-    } else {
-        resolveNight(); 
-    }
-}
+function runNight() { const order = ["wolf", "vampire", "seer", "bodyguard", "witch", "elder", "cult_leader"]; if(nightStep < order.length) renderNightRole(order[nightStep]); else resolveNight(); }
 
 function renderNightRole(type) {
-    const isAlive = (type === "wolf") ? players.some(p => ['wolf','wolf_cub','hell_hound','lone_wolf'].includes(p.role) && p.alive) : players.some(p => p.role === type && p.alive);
+    const isAlive = (type === "wolf") ? players.some(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role) && p.alive) : players.some(p => p.role === type && p.alive);
     if(!isAlive) { nightStep++; runNight(); return; }
     
-    let html = `<div class="glass-panel"><div class="gm-script">GM: ให้ ${roleNameTH[type].split(" ")[1]} ลืมตาขึ้นมา</div>`;
+    let awakePlayers = [];
+    if(type === 'wolf') awakePlayers = players.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role) && p.alive).map(p => p.name);
+    else awakePlayers = players.filter(p => p.role === type && p.alive).map(p => p.name);
+
+    let html = `<div class="glass-panel"><div class="gm-script" style="flex-direction:column; align-items:flex-start; line-height: 1.4;">
+        <div style="font-size:16px;">GM: ให้ ${getRoleName(type).split(" ")[1]} ลืมตาขึ้นมา</div>
+        <div style="font-size:12px; font-weight:normal; margin-top:4px; color:rgba(0,0,0,0.7);">(ผู้ที่ต้องลืมตา: ${awakePlayers.length > 0 ? awakePlayers.join(", ") : 'ไม่มี'})</div>
+    </div>`;
     
-    if(type === "witch") {
-        html += `<div style="color:var(--danger); text-align:center; font-size:16px; margin-bottom:15px; font-weight:bold;">ผู้ที่ถูกหมาป่าโจมตี: ${nightKillTargets.map(idx => players[idx].name).join(", ") || 'ไม่มี'}</div>`;
-    }
+    if(type === "witch") html += `<div style="color:var(--danger); text-align:center; font-size:16px; margin-bottom:15px; font-weight:bold;">${currentLang === 'TH' ? 'ผู้ที่ถูกหมาป่าโจมตี' : 'Wolf Attack'}: ${nightKillTargets.map(idx => players[idx].name).join(", ") || 'ไม่มี'}</div>`;
     
-    if(type === "wolf" && wolfBuff) {
-        wolfBuffUsed = true;
-        html += `<div style="color:var(--danger); text-align:center; font-size:16px; margin-bottom:15px; font-weight:bold;">⚠️ ความโกรธแค้น! คืนนี้หมาป่าสามารถเลือกสังหารได้ 2 คน</div>`;
-    }
-    
-    html += `<div class="game-grid">`;
-    
-    html += players.map((p, i) => {
-        if(!p.alive && type !== "witch") return "";
-        let btn = "", sel = false;
-        // FIXED: ซ่อนสีชมพูในหน้ากลางคืนถ้าโหมด Privacy เปิดอยู่
-        const nameClass = (!isPrivacyMode && lovers.includes(i)) ? "lover-name" : "";
-        
-        if(type === "wolf") { 
-            const limit = wolfBuff ? 2 : 1;
-            sel = nightKillTargets.includes(i); 
-            btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="if(nightKillTargets.includes(${i})) nightKillTargets=nightKillTargets.filter(x=>x!==${i}); else if(nightKillTargets.length<${limit}) nightKillTargets.push(${i}); renderNightRole('wolf')">${sel?'ยกเลิก':'เลือก'}</button>`; 
+    if(type === "wolf") {
+        if(wolvesSick) {
+            html += `<div style="color:var(--danger); text-align:center; font-size:16px; margin-bottom:15px; font-weight:bold;">🤢 หมาป่าติดเชื้อจากผู้ป่วย! คืนนี้ไม่มีแรงออกล่า</div>`;
+            html += `<button class="primary" style="width:100%; margin-top:15px; height:45px; font-size:16px;" onclick="nightStep++; runNight()">รับทราบ (ข้ามเทิร์น)</button></div>`;
+            gamePlayers.innerHTML = html;
+            return;
         }
-        else if(type === "seer") {
-            const isWolfTeam = ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_human'].includes(p.role);
+        if(wolfBuff) { wolfBuffUsed = true; html += `<div style="color:var(--danger); text-align:center; font-size:16px; margin-bottom:15px; font-weight:bold;">⚠️ ความโกรธแค้น! คืนนี้หมาป่าสังหารได้ 2 คน</div>`; }
+    }
+    
+    html += `<div class="game-grid">` + players.map((p, i) => {
+        if(!p.alive && type !== "witch") return "";
+        let btn = "", sel = false; 
+        const nameClass = ""; 
+        
+        if(type === "wolf") { const limit = wolfBuff ? 2 : 1; sel = nightKillTargets.includes(i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="if(nightKillTargets.includes(${i})) nightKillTargets=nightKillTargets.filter(x=>x!==${i}); else if(nightKillTargets.length<${limit}) nightKillTargets.push(${i}); renderNightRole('wolf')">${sel?'ยกเลิก':'เลือก'}</button>`; }
+        else if(type === "vampire") { sel = (vampireKillTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="vampireKillTarget=${sel ? 'null' : i}; renderNightRole('vampire')">${sel?'ยกเลิก':'สูบเลือด'}</button>`; }
+        else if(type === "seer") { 
+            const isWolfTeam = ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_human'].includes(p.role); 
+            const isVampire = (p.role === 'vampire');
             let teamColor = "white";
-            if(['villager','seer','witch','bodyguard','cupid','tough_guy','elder','wolf_human','pacifist','fool'].includes(p.role)) teamColor = "var(--success)";
-            if(['wolf','wolf_cub','minion','hell_hound'].includes(p.role)) teamColor = "var(--danger)";
-            if(p.role === 'jester') teamColor = "var(--special)"; 
+            if(['villager','seer','witch','bodyguard','cupid','tough_guy','elder','wolf_human','pacifist','fool','prince','hunter','priest','sick','mason','cursed','drunk'].includes(p.role)) teamColor = "var(--success)";
+            if(['wolf','wolf_cub','minion','hell_hound','wolf_man'].includes(p.role)) teamColor = "var(--danger)";
+            if(p.role === 'jester') teamColor = "var(--jester)"; 
+            if(p.role === 'vampire') teamColor = "var(--special)"; 
             if(p.role === 'thug') teamColor = "var(--thug)"; 
             if(p.role === 'lone_wolf') teamColor = "var(--lone-wolf)";
-            btn = `<div style="text-align:right;"><b style="color:${isWolfTeam ? 'var(--danger)' : 'var(--success)'}">${isWolfTeam ? 'หมาป่า' : 'ชาวบ้าน'}</b><br><small style="color:${teamColor}">${roleNameTH[p.role]}</small></div>`;
+            
+            let detectedTeam = isWolfTeam ? (currentLang === 'TH' ? 'หมาป่า' : 'Werewolf') : (currentLang === 'TH' ? 'ชาวบ้าน' : 'Villager');
+            if (isVampire) detectedTeam = (currentLang === 'TH' ? 'แวมไพร์' : 'Vampire');
+            let detectedColor = isWolfTeam ? 'var(--danger)' : 'var(--success)';
+            if (isVampire) detectedColor = 'var(--special)';
+            
+            btn = `<div style="text-align:right;"><b style="color:${detectedColor}">${detectedTeam}</b><br><small style="color:${teamColor}">${getRoleName(p.role)}</small></div>`; 
         }
-        else if(type === "bodyguard") { 
-            sel = (nightGuardTarget === i); 
-            btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" ${lastGuardTarget === i ? 'disabled' : ''} onclick="nightGuardTarget=${sel ? 'null' : i}; renderNightRole('bodyguard')">${lastGuardTarget === i ? 'ห้ามซ้ำ' : (sel ? 'ยกเลิก' : 'ปกป้อง')}</button>`; 
+        else if(type === "bodyguard") { sel = (nightGuardTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" ${lastGuardTarget === i ? 'disabled' : ''} onclick="nightGuardTarget=${sel ? 'null' : i}; renderNightRole('bodyguard')">${lastGuardTarget === i ? 'ห้ามซ้ำ' : (sel ? 'ยกเลิก' : 'ปกป้อง')}</button>`; }
+        else if(type === "witch" && p.alive && !witchUsed) { 
+            if(witchPoisonTarget === i) { sel = true; btn = `<button class="warning" style="color:black" onclick="witchAction=null; witchPoisonTarget=null; renderNightRole('witch')">ยกเลิก</button>`; }
+            else if(witchAction !== 'heal') { btn = `<button class="danger" style="color:white" onclick="witchAction='poison'; witchPoisonTarget=${i}; renderNightRole('witch')">ยาพิษ</button>`; }
         }
-        else if(type === "witch" && p.alive) { 
-            if(!witchUsed) {
-                sel = (witchPoisonTarget === i);
-                btn = `<button class="${sel ? 'warning' : 'danger'}" style="color:${sel?'black':'white'}" onclick="witchAction=${sel ? 'null' : "'poison'"}; witchPoisonTarget=${sel ? 'null' : i}; renderNightRole('witch')">${sel ? 'ยกเลิก' : 'ยาพิษ'}</button>`; 
-            }
-        }
-        else if(type === "elder") { 
-            sel = (elderSilenceTarget === i); 
-            btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="elderSilenceTarget=${sel ? 'null' : i}; renderNightRole('elder')">${sel ? 'ยกเลิก' : 'เนรเทศ'}</button>`; 
-        }
-        else if(type === "cult_leader" && !p.isCult) { 
-            sel = cultRecruits.includes(i); 
-            btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="cultRecruits=${sel ? '[]' : '['+i+']'}; renderNightRole('cult_leader')">${sel ? 'ยกเลิก' : 'ชวน'}</button>`; 
-        }
-        
+        else if(type === "elder") { sel = (elderSilenceTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="elderSilenceTarget=${sel ? 'null' : i}; renderNightRole('elder')">${sel ? 'ยกเลิก' : 'เนรเทศ'}</button>`; }
+        else if(type === "cult_leader" && !p.isCult) { sel = cultRecruits.includes(i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="cultRecruits=${sel ? '[]' : '['+i+']'}; renderNightRole('cult_leader')">${sel ? 'ยกเลิก' : 'ชวน'}</button>`; }
         return `<div class="game-card ${sel ? 'selected-card' : ''} ${!p.alive ? 'dead' : ''}"><b class="${nameClass}">${p.name}</b>${btn}</div>`;
-    }).join("");
+    }).join("") + `</div>`;
     
-    html += `</div>`;
-    
-    if(type === "witch") {
-        if(witchUsed) {
-            html += `<div style="text-align:center; padding:12px; color:#94a3b8;">(ยาวิเศษถูกใช้ไปแล้วในคืนก่อนๆ)</div>`;
-        } else if(nightKillTargets.length > 0 && witchPoisonTarget === null) { 
-            html += `<button class="${witchAction === 'heal' ? 'warning' : 'success'}" style="width:100%; margin-top:12px; color:${witchAction === 'heal' ? 'black' : 'white'}" onclick="witchAction=${witchAction === 'heal' ? 'null' : "'heal'"}; renderNightRole('witch')">${witchAction === 'heal' ? 'ยกเลิกการใช้ยาชุบ' : 'ใช้ยาชุบชีวิต'}</button>`; 
-        }
+    if(type === "witch") { 
+        if(witchUsed) html += `<div style="text-align:center; padding:12px; color:#94a3b8;">(ยาถูกใช้ไปแล้ว)</div>`; 
+        else if(nightKillTargets.length > 0 && witchPoisonTarget === null) html += `<button class="${witchAction === 'heal' ? 'warning' : 'success'}" style="width:100%; margin-top:12px; color:${witchAction === 'heal' ? 'black' : 'white'}" onclick="witchAction=${witchAction === 'heal' ? 'null' : "'heal'"}; renderNightRole('witch')">${witchAction === 'heal' ? 'ยกเลิกการใช้ยาชุบ' : 'ใช้ยาชุบชีวิต'}</button>`; 
     }
     
-    let nextBtnText = "ยืนยัน และให้หลับตาลง";
-    if (type === "witch" && !witchUsed && witchAction === null) {
-        nextBtnText = "ไม่ใช้ความสามารถ (ข้าม)";
-    }
+    let nextBtnText = "ยืนยัน";
+    if (type === "witch" && !witchUsed && witchAction === null) nextBtnText = "ไม่ใช้ความสามารถ";
     
     html += `<button class="primary" style="width:100%; margin-top:15px; height:45px; font-size:16px;" onclick="nightStep++; runNight()">${nextBtnText}</button></div>`;
     gamePlayers.innerHTML = html;
 }
 
 function resolveNight() {
-    players.forEach((p, i) => { 
-        if(p.alive && p.toughGuyBleeding) { 
-            p.alive = false; 
-            deadThisNight.push(p.name); 
-            secretLogs.push(`${p.name} ทนพิษบาดแผลไม่ไหว (หนุ่มถึก)`);
-            addLog(`${p.name} ทนพิษบาดแผลไม่ไหว`); 
-            if(p.role === 'wolf_cub') wolfBuff = true;
-            checkDeathLinks(i, true); 
-            p.toughGuyBleeding = false; 
+    if (witchAction !== null) witchUsed = true; 
+    
+    players.forEach((p, i) => { if(p.alive && p.toughGuyBleeding) { p.alive = false; deadThisNight.push(p.name); secretLogs.push(`${p.name} ทนพิษบาดแผลไม่ไหว (หนุ่มถึก)`); addLog(`${p.name} ทนพิษบาดแผลไม่ไหว`); if(p.role === 'wolf_cub') wolfBuff = true; if(p.role === 'hunter' && !pendingHunters.includes(i)) pendingHunters.push(i); checkDeathLinks(i, true); p.toughGuyBleeding = false; } });
+    
+    nightKillTargets.forEach(t => { 
+        if(t === nightGuardTarget) { secretLogs.push(`บอดี้การ์ดปกป้อง ${players[t].name} สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[t].name}`); } 
+        else if (players[t].role === 'cursed') { players[t].role = 'wolf'; secretLogs.push(`🧟 ${players[t].name} ถูกกัด! คำสาปทำงาน กลายร่างเป็นหมาป่า`); addLog(`🧟 ${players[t].name} คำสาปกำเริบ!`); }
+        else if (players[t].role === 'vampire') { secretLogs.push(`🧛🏻‍♀️ หมาป่าพยายามกัด ${players[t].name} แต่เขาคือแวมไพร์ (ไม่ตาย)`); addLog(`หมาป่ากัด ${players[t].name} ไม่เข้า`); }
+        else if(witchAction === 'heal') { secretLogs.push(`แม่มดชุบชีวิต ${players[t].name} สำเร็จ`); addLog(`แม่มดช่วย ${players[t].name}`); } 
+        else { 
+            if(players[t].role === 'sick') makeWolvesSickNextNight = true;
+            if(players[t].role === 'tough_guy' && !players[t].toughGuyBleeding) { players[t].toughGuyBleeding = true; secretLogs.push(`${players[t].name} บาดเจ็บสาหัสจากการโดนกัด (หนุ่มถึก)`); addLog(`${players[t].name} บาดเจ็บ`); } 
+            else if(players[t].alive) { 
+                players[t].alive = false; deadThisNight.push(players[t].name); secretLogs.push(`${players[t].name} ถูกหมาป่าสังหาร`); addLog(`${players[t].name} ถูกฆ่า`); 
+                if(players[t].role === 'wolf_cub') wolfBuff = true; 
+                if(players[t].role === 'hunter' && !pendingHunters.includes(t)) pendingHunters.push(t);
+                checkDeathLinks(t, true); 
+            } 
         } 
     });
-    
-    nightKillTargets.forEach(t => {
-        if(t === nightGuardTarget) { 
-            secretLogs.push(`บอดี้การ์ดปกป้อง ${players[t].name} สำเร็จ`);
-            addLog(`บอดี้การ์ดปกป้อง ${players[t].name} สำเร็จ`); 
-        }
-        else if(witchAction === 'heal') { 
-            secretLogs.push(`แม่มดชุบชีวิต ${players[t].name} สำเร็จ`);
-            addLog(`แม่มดช่วยชีวิต ${players[t].name}`); 
-            witchUsed = true; 
-        }
-        else {
-            if(players[t].role === 'tough_guy' && !players[t].toughGuyBleeding) { 
-                players[t].toughGuyBleeding = true; 
-                secretLogs.push(`${players[t].name} บาดเจ็บสาหัสจากการโดนกัด (หนุ่มถึก)`);
-                addLog(`${players[t].name} บาดเจ็บสาหัส`); 
-            }
-            else if(players[t].alive) { 
-                players[t].alive = false; 
-                deadThisNight.push(players[t].name); 
-                secretLogs.push(`${players[t].name} ถูกหมาป่าสังหาร`);
-                addLog(`${players[t].name} ถูกหมาป่าฆ่า`); 
-                if(players[t].role === 'wolf_cub') wolfBuff = true;
-                checkDeathLinks(t, true); 
+
+    if (vampireKillTarget !== null) {
+        let vt = vampireKillTarget;
+        if (vt === nightGuardTarget) {
+            secretLogs.push(`บอดี้การ์ดปกป้อง ${players[vt].name} จากแวมไพร์ สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[vt].name}`);
+        } else {
+            if (players[vt].role === 'tough_guy' && !players[vt].toughGuyBleeding) {
+                players[vt].toughGuyBleeding = true; secretLogs.push(`${players[vt].name} บาดเจ็บสาหัสจากการถูกสูบเลือด (หนุ่มถึก)`); addLog(`${players[vt].name} บาดเจ็บ`);
+            } else if (players[vt].alive) {
+                players[vt].alive = false; deadThisNight.push(players[vt].name); secretLogs.push(`${players[vt].name} ถูกแวมไพร์สูบเลือดจนตาย`); addLog(`${players[vt].name} ถูกสูบเลือด`);
+                if(players[vt].role === 'wolf_cub') wolfBuff = true; 
+                if(players[vt].role === 'hunter' && !pendingHunters.includes(vt)) pendingHunters.push(vt);
+                checkDeathLinks(vt, true);
             }
         }
-    });
+    }
     
     if(witchAction === 'poison' && witchPoisonTarget !== null) { 
-        players[witchPoisonTarget].alive = false; 
-        deadThisNight.push(players[witchPoisonTarget].name); 
-        secretLogs.push(`${players[witchPoisonTarget].name} ถูกยาพิษแม่มดสังหาร`);
-        addLog(`${players[witchPoisonTarget].name} ถูกแม่มดสังหาร`); 
-        if(players[witchPoisonTarget].role === 'wolf_cub') wolfBuff = true; 
-        checkDeathLinks(witchPoisonTarget, true); 
-        witchUsed = true; 
+        let pt = witchPoisonTarget; players[pt].alive = false; deadThisNight.push(players[pt].name); secretLogs.push(`${players[pt].name} ถูกยาพิษแม่มดสังหาร`); addLog(`${players[pt].name} โดนยาพิษ`); 
+        if(players[pt].role === 'wolf_cub') wolfBuff = true; 
+        if(players[pt].role === 'hunter' && !pendingHunters.includes(pt)) pendingHunters.push(pt);
+        checkDeathLinks(pt, true); 
     }
     
-    witchAction = null;
-    
-    if(elderSilenceTarget !== null) { 
-        players[elderSilenceTarget].silenced = true; 
-        silencedThisNight.push(players[elderSilenceTarget].name); 
-        secretLogs.push(`${players[elderSilenceTarget].name} ถูกแม่เฒ่าเนรเทศให้งดโหวต`);
-        addLog(`${players[elderSilenceTarget].name} ถูกเนรเทศ`); 
-    }
-    
+    if(elderSilenceTarget !== null) { players[elderSilenceTarget].silenced = true; silencedThisNight.push(players[elderSilenceTarget].name); secretLogs.push(`${players[elderSilenceTarget].name} ถูกแม่เฒ่าเนรเทศให้งดโหวต`); }
     cultRecruits.forEach(i => { 
-        players[i].isCult = true; 
-        secretLogs.push(`${players[i].name} ถูกล้างสมองเข้าสู่ลัทธิ`);
-        addLog(`${players[i].name} เข้าลัทธิ`); 
-    });
+        if (players[i].role === 'vampire') {
+            secretLogs.push(`🪬 เจ้าลัทธิพยายามชวน ${players[i].name} แต่ล้มเหลวเพราะเขาคือแวมไพร์`);
+        } else {
+            players[i].isCult = true; secretLogs.push(`🪬 ${players[i].name} ถูกล้างสมองเข้าสู่ลัทธิ`); 
+        }
+    }); 
     
     lastGuardTarget = nightGuardTarget; 
+    if (wolvesSick) wolvesSick = false; 
+    if (makeWolvesSickNextNight) wolvesSick = true; 
+    if (wolfBuffUsed) { wolfBuff = false; wolfBuffUsed = false; }
     
-    if (wolfBuffUsed) {
-        wolfBuff = false;
-        wolfBuffUsed = false;
-    }
-    
-    let publicMsg = deadThisNight.length ? "ผู้เสียชีวิตเมื่อคืน: <br><br>" + deadThisNight.join("<br>") : "เมื่อคืนไม่มีผู้เสียชีวิต";
+    let publicMsg = deadThisNight.length ? "ผู้ตาย: <br>" + deadThisNight.join("<br>") : "เมื่อคืนไม่มีคนตาย";
     if(silencedThisNight.length) publicMsg += "<br><br><span style='color:var(--warning)'>ผู้ที่ถูกเนรเทศงดออกเสียง:</span><br>" + silencedThisNight.join("<br>");
-    
     let secretMsg = secretLogs.length ? secretLogs.map(l => `<li>${l}</li>`).join("") : "<li>ไม่มีเหตุการณ์พิเศษ</li>";
     
     document.getElementById("publicNightSummary").innerHTML = publicMsg;
@@ -869,37 +725,8 @@ function resolveNight() {
 }
 
 function checkDeathLinks(idx, isNight){
-    if(lovers.includes(idx)) {
-        lovers.forEach(l => { 
-            if(players[l].alive) { 
-                players[l].alive = false; 
-                addLog(`${players[l].name} ตรอมใจตายตามคนรัก`); 
-                if(isNight) {
-                    deadThisNight.push(players[l].name);
-                    secretLogs.push(`${players[l].name} ตายตามคนรัก`);
-                } else {
-                    deadThisVote.push(players[l].name);
-                }
-                if(players[l].role === 'wolf_cub') wolfBuff = true; 
-                checkDeathLinks(l, isNight); 
-            } 
-        });
-    }
-    if(hellHoundPartner === idx) { 
-        const hh = players.findIndex(p => p.role === 'hell_hound' && p.alive); 
-        if(hh !== -1) { 
-            players[hh].alive = false; 
-            addLog(`${players[hh].name} ตายตามคู่ชีวิตลับ (หมาป่าโลกันตร์)`); 
-            if(isNight) {
-                deadThisNight.push(players[hh].name);
-                secretLogs.push(`${players[hh].name} ตายตามคู่ชีวิตลับ`);
-            } else {
-                deadThisVote.push(players[hh].name);
-            }
-            if(players[hh].role === 'wolf_cub') wolfBuff = true;
-            checkDeathLinks(hh, isNight); 
-        } 
-    }
+    if(lovers.includes(idx)) lovers.forEach(l => { if(players[l].alive) { players[l].alive = false; addLog(`💘 ${players[l].name} ตายตามคนรัก`); if(isNight) { deadThisNight.push(players[l].name); secretLogs.push(`💘 ${players[l].name} ตายตามคนรัก`); } else { deadThisVote.push(players[l].name); } if(players[l].role === 'wolf_cub') wolfBuff = true; if(players[l].role === 'hunter' && !pendingHunters.includes(l)) pendingHunters.push(l); checkDeathLinks(l, isNight); } });
+    if(hellHoundPartner === idx) { const hh = players.findIndex(p => p.role === 'hell_hound' && p.alive); if(hh !== -1) { players[hh].alive = false; addLog(`🔥 ${players[hh].name} ตายตามคู่ชีวิต`); if(isNight) { deadThisNight.push(players[hh].name); secretLogs.push(`🔥 ${players[hh].name} ตายตามคู่ชีวิตลับ`); } else { deadThisVote.push(players[hh].name); } if(players[hh].role === 'wolf_cub') wolfBuff = true; if(players[hh].role === 'hunter' && !pendingHunters.includes(hh)) pendingHunters.push(hh); checkDeathLinks(hh, isNight); } }
 }
 
 function closeNightSummary() { 
@@ -907,123 +734,105 @@ function closeNightSummary() {
     document.getElementById("nightSummaryModal").classList.remove("active"); 
     addLog(`เช้าวันที่ ${dayCount}`, true); 
     
-    const timerPanel = document.getElementById("dayTimerPanel");
-    const btnNight = document.getElementById("btnStartNight");
-    if(timerPanel) timerPanel.classList.remove("hidden");
-    if(btnNight) btnNight.classList.remove("hidden");
-    
-    if(!checkWinCondition()) renderGame(); 
+    if (pendingHunters.length > 0) {
+        processPendingHunters(() => { resumeMorning(); });
+    } else {
+        resumeMorning();
+    }
 }
 
-// ================= 🏆 Check Win Conditions ================= //
+function resumeMorning() {
+    document.getElementById("dayTimerPanel").classList.remove("hidden"); 
+    document.getElementById("btnStartNight").classList.remove("hidden"); 
+    
+    if (deadThisVote.length > 0) { 
+        document.getElementById("dayDeathSummary").innerHTML = deadThisVote.map(n => `💀 ${n}`).join("<br>"); 
+        document.getElementById("dayDeathModal").classList.add("active"); 
+    } else {
+        if(!checkWinCondition()) renderGame(); 
+    }
+}
+
 function checkWinCondition() {
-    const alive = players.filter(p => p.alive);
-    const cults = alive.filter(p => p.isCult);
+    const alive = players.filter(p => p.alive); 
+    const wolves = alive.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role));
+    const vampires = alive.filter(p => p.role === 'vampire');
     
-    if(alive.length > 0 && alive.length === cults.length) { 
-        finishGame('cult', players.filter(p => p.isCult || p.role === 'cult_leader').map(p => p.name)); 
-        return true; 
-    }
+    if(alive.length > 0 && alive.every(p => p.isCult)) { finishGame('cult', players.filter(p => p.isCult).map(p => p.name)); return true; }
+    if(lastKilledByVote !== null && players[lastKilledByVote].role === 'jester' && !players[lastKilledByVote].isCult) { finishGame('jester', [players[lastKilledByVote].name]); return true; }
     
-    if(lastKilledByVote !== null && players[lastKilledByVote].role === 'jester' && !players[lastKilledByVote].isCult) { 
-        finishGame('jester', [players[lastKilledByVote].name]); 
-        return true; 
-    }
-    
-    const wolvesAlive = alive.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf'].includes(p.role));
-    const villagersAlive = alive.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf'].includes(p.role));
-    
-    const wolvesWin = (wolvesAlive.length >= villagersAlive.length) && wolvesAlive.length > 0;
-    const villagersWin = wolvesAlive.length === 0;
+    const vampireWin = vampires.length > 0 && vampires.length >= (alive.length - vampires.length);
+    if (vampireWin) { finishGame('vampire', vampires.map(p => p.name)); return true; }
     
     const thugIdx = players.findIndex(p => p.role === 'thug' && p.alive && !p.isCult);
     const thugDone = thugIdx !== -1 && thugTargets.length > 0 && thugTargets.every(t => !players[t].alive);
     
+    const wolvesWin = wolves.length >= (alive.length - wolves.length) && wolves.length > 0;
+    const villagersWin = wolves.length === 0 && vampires.length === 0;
+
     if(thugDone) {
         let winners = [players[thugIdx].name];
         if(wolvesWin) {
-            winners.push(...players.filter(p => ['wolf','wolf_cub','minion','hell_hound'].includes(p.role)).map(p => p.name));
+            winners.push(...players.filter(p => ['wolf','wolf_cub','minion','hell_hound','wolf_man'].includes(p.role)).map(p => p.name));
             finishGame('thug', [...new Set(winners)], true); 
+        } else if (vampireWin) {
+            winners.push(...vampires.map(p => p.name));
+            finishGame('thug', [...new Set(winners)], true);
         } else if(villagersWin) {
-            winners.push(...players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader'].includes(p.role)).map(p => p.name));
+            winners.push(...players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role)).map(p => p.name));
             finishGame('thug', [...new Set(winners)], true); 
         } else {
             finishGame('thug', winners); 
         }
         return true;
     }
-    
-    if(wolvesWin) {
+
+    if(wolvesWin) { 
         const lone = alive.find(p => p.role === 'lone_wolf');
-        if(lone && !alive.some(p => ['wolf','wolf_cub','hell_hound'].includes(p.role))) { 
-            finishGame('lone_wolf', [lone.name]); 
-            return true; 
-        }
-        finishGame('wolf', players.filter(p => ['wolf','wolf_cub','minion','hell_hound'].includes(p.role)).map(p => p.name)); 
-        return true;
+        if(lone && wolves.length === 1) { finishGame('lone_wolf', [lone.name]); return true; }
+        finishGame('wolf', players.filter(p => ['wolf','wolf_cub','hell_hound','minion','wolf_man'].includes(p.role)).map(p => p.name)); return true; 
     }
-    
     if(villagersWin) { 
-        finishGame('village', players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug'].includes(p.role)).map(p => p.name)); 
-        return true; 
+        finishGame('village', players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role)).map(p => p.name)); return true; 
     }
-    
     return false;
 }
 
 function finishGame(type, winners, isCoWin = false) {
-    try { bgmAudio.pause(); winAudio.play(); } catch(e){}
-    const msg = getRandomWinMessage(type);
-    
-    gameScreen.classList.add("hidden"); 
-    document.getElementById("summaryScreen").classList.remove("hidden");
-    
+    try { bgmAudio.pause(); winAudio.play(); } catch(e){} const msg = getRandomWinMessage(type);
+    document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("summaryScreen").classList.remove("hidden");
     document.getElementById("winTitle").innerText = msg.title + (isCoWin ? " (ชนะร่วม)" : "");
     document.getElementById("winDesc").innerText = msg.desc;
-    document.getElementById("winnerNamesDisplay").innerHTML = `<div style="color:var(--success); font-weight:bold; margin-bottom:10px; font-size:16px;">รายชื่อผู้ที่ได้รับชัยชนะ:</div>${winners.join("<br>")}`;
-    
+    document.getElementById("winnerNamesDisplay").innerHTML = `<div style="color:var(--success); font-weight:bold; margin-bottom:10px; font-size:18px;">รายชื่อผู้ที่ได้รับชัยชนะ:</div>${winners.join("<br>")}`;
     document.getElementById("summaryPlayers").innerHTML = players.map((p, i) => {
         const nameClass = lovers.includes(i) ? "lover-name" : ""; 
-        let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (p.silenced ? ' 🔇' : ''); 
-        return `<div class="game-card ${p.alive ? '' : 'dead'}"><div><b class="${nameClass}" style="font-size:15px;">${p.name}</b> ${status}</div><div class="role-pill ${p.role}">${roleNameTH[p.role]}</div></div>`;
+        let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (p.silenced ? ' 🔇' : ''); 
+        return `<div class="game-card ${p.alive ? '' : 'dead'}"><div><b class="${nameClass}" style="font-size:15px;">${p.name}</b> ${status}</div><div class="role-pill ${p.role}">${getRoleName(p.role)}</div></div>`;
     }).join("");
 }
 
-function copySummary() { 
-    let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n${document.getElementById("winDesc").innerText}\n\n`; 
-    players.forEach((p, i) => { 
-        let status = (p.isCult ? ' 🪬' : '') + (p.silenced ? ' 🔇' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : ''); 
-        text += `${i+1}. ${p.name} ${status} : ${roleNameTH[p.role]} (${p.alive ? 'รอด' : 'ตาย'})\n`; 
-    }); 
-    navigator.clipboard.writeText(text).then(() => alert("คัดลอกลงคลิปบอร์ดแล้ว!")); 
-}
-
 function renderGame() {
-    gamePlayers.innerHTML = `<div class="game-grid">${players.map((p, i) => {
-        let team = "team-village", nameClass = "";
-        // FIXED: กำหนดเงื่อนไขซ่อนสีชื่อคู่รักเมื่ออยู่ใน Privacy Mode
-        if(!isPrivacyMode) {
-            nameClass = lovers.includes(i) ? "lover-name" : "";
+    gamePlayers.innerHTML = `<div class="game-grid">` + players.map((p, i) => {
+        let team = "team-village", nameClass = (!isPrivacyMode && lovers.includes(i)) ? "lover-name" : "";
+        if(!isPrivacyMode) { 
             if(p.isCult) team = "team-cult"; 
-            else if(['wolf','wolf_cub','hell_hound','minion'].includes(p.role)) team = "team-wolf";
+            else if(['wolf','wolf_cub','hell_hound','minion','wolf_man'].includes(p.role)) team = "team-wolf"; 
             else if(p.role === 'jester') team = "team-jester"; 
+            else if(p.role === 'vampire') team = "team-vampire"; 
             else if(p.role === 'thug') team = "team-thug"; 
-            else if(p.role === 'lone_wolf') team = "team-lone";
+            else if(p.role === 'lone_wolf') team = "team-lone"; 
         }
         
-        let status = (p.silenced ? ' 🔇' : '') + (!isPrivacyMode ? ((p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (p.toughGuyBleeding ? ' 🩸' : '')) : '');
+        let status = (p.silenced ? ' 🔇' : '') + (!isPrivacyMode ? ((p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : '') + (p.toughGuyBleeding ? ' 🩸' : '')) : '');
         
-        return `<div class="game-card ${team} ${p.alive ? '' : 'dead'}">
-            <div><b class="${nameClass}" style="font-size:16px;">${p.name}</b>${status}</div>
-            <div class="role-pill ${p.role}">${roleNameTH[p.role]}</div>
-            <button class="warning" style="color:black;" onclick="nominate(${i})">เสนอชื่อ</button>
-        </div>`;
-    }).join("")}</div>`;
+        return `<div class="game-card ${team} ${p.alive ? '' : 'dead'}"><div><b class="${nameClass}" style="font-size:16px; color:#fff;">${p.name}</b>${status}</div><div class="role-pill ${p.role}">${getRoleName(p.role)}</div><button class="warning" onclick="nominate(${i})">เสนอชื่อ</button></div>`;
+    }).join("") + `</div>`;
 }
 
+function copySummary() { let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n`; players.forEach((p, i) => { let status = (p.isCult ? ' 🪬' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (p.silenced ? ' 🔇' : ''); text += `${i+1}. ${p.name} ${status} : ${getRoleName(p.role)} (${p.alive ? 'รอด' : 'ตาย'})\n`; }); navigator.clipboard.writeText(text).then(() => alert("คัดลอกแล้ว!")); }
 function resetToSetup(){ location.reload(); }
-function endGameConfirm(){ if(confirm("ต้องการจบเกมและกลับหน้าแรกหรือไม่?")) resetToSetup(); }
-function backToSetup(){ gameScreen.classList.add("hidden"); setupScreen.classList.remove("hidden"); }
+function endGameConfirm(){ if(confirm("จบเกม?")) resetToSetup(); }
+function backToSetup(){ document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); }
 load();
 </script>
 </body>
