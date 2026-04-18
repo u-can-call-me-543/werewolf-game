@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Werewolf GM v5.75 (The Memory Fix)</title>
+<title>Werewolf GM v5.76 (Master Edition)</title>
 
 <style>
 :root {
@@ -88,7 +88,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 @media (min-width: 600px) { .game-grid { grid-template-columns: 1fr 1fr; } }
 .game-card { background: rgba(30, 41, 59, 0.4); border-radius: 18px; padding: 12px; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; border-left: 6px solid #475569; transition: 0.3s; }
 
-/* Team Background Colors (Pastel) */
+/* Team Background Colors */
 .team-village { border-left-color: var(--success); background: rgba(52, 211, 153, 0.1); }
 .team-wolf { border-left-color: var(--danger); background: rgba(251, 113, 133, 0.1); }
 .team-jester { border-left-color: var(--jester); background: rgba(214, 163, 122, 0.1); }
@@ -97,7 +97,6 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 .team-lone { border-left-color: var(--lone-wolf); background: rgba(148, 163, 184, 0.1); }
 .team-cult { border-left-color: var(--cult); background: rgba(56, 189, 248, 0.1); }
 
-/* Vibrant Role Pills */
 .role-pill { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: 900; text-align: center; color: white; min-width: 75px; }
 .villager, .seer, .witch, .bodyguard, .cupid, .tough_guy, .elder, .wolf_human, .pacifist, .fool, .prince, .hunter, .priest, .sick, .mason, .cursed, .drunk { background: #10b981; }
 .wolf, .wolf_cub, .minion, .hell_hound, .wolf_man { background: #ef4444; }
@@ -120,8 +119,13 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 #fullScreenTimer.active { display: flex; }
 #massiveTimerDisplay { font-size: clamp(60px, 18vw, 120px); font-weight: bold; color: white; margin: 15px 0; font-variant-numeric: tabular-nums; line-height: 1; }
 
-#trialModal, #nightSummaryModal, #dayDeathModal, #hunterModal { position:fixed; top:0; left:0; width: 100vw; height: 100vh; background:rgba(2, 6, 23, 0.95); z-index:2500; display:none; align-items:center; justify-content:center; padding:15px; box-sizing: border-box; }
-#trialModal.active, #nightSummaryModal.active, #dayDeathModal.active, #hunterModal.active { display:flex; }
+/* Modal Styles */
+.custom-modal { position:fixed; top:0; left:0; width: 100vw; height: 100vh; background:rgba(2, 6, 23, 0.95); z-index:2500; display:none; align-items:center; justify-content:center; padding:15px; box-sizing: border-box; }
+.custom-modal.active { display:flex; }
+
+/* Morning Summary Custom Classes */
+.summary-public { background: #ff7675; border-left: 6px solid #d63031; padding: 12px; margin-bottom: 15px; border-radius: 8px; text-align: left; color: white; font-weight: bold; font-size: 15px;}
+.summary-secret { background: #a29bfe; border-left: 6px solid #6c5ce7; padding: 12px; border-radius: 8px; text-align: left; color: white;}
 </style>
 </head>
 <body>
@@ -136,12 +140,30 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
    <button class="danger" style="padding: 14px 30px; font-size: 16px; color: white;" onclick="stopCustomTimer()">หยุดเวลาและปิดหน้าจอ</button>
 </div>
 
+<div id="gmAlertModal" class="custom-modal">
+    <div class="glass-panel" style="width:100%; max-width:350px; text-align:center; border:2px solid var(--primary);">
+        <h2 id="gmAlertTitle" style="color:var(--primary); margin-top:0;">แจ้งเตือน</h2>
+        <p id="gmAlertText" style="font-size:16px; line-height:1.5; color:white;"></p>
+        <button class="primary" style="width:100%; margin-top:15px;" onclick="closeGmAlert()">รับทราบ</button>
+    </div>
+</div>
+
+<div id="gmConfirmModal" class="custom-modal">
+    <div class="glass-panel" style="width:100%; max-width:350px; text-align:center; border:2px solid var(--danger);">
+        <h2 style="color:var(--danger); margin-top:0;">ยืนยัน</h2>
+        <p id="gmConfirmText" style="font-size:16px; color:white;"></p>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button id="gmConfirmYes" class="danger" style="color:white; flex:1;">ยืนยัน</button>
+            <button class="ghost" style="flex:1;" onclick="closeGmConfirm()">ยกเลิก</button>
+        </div>
+    </div>
+</div>
 <div class="container">
   <div id="groupScreen" class="screen">
     <div class="glass-panel" style="text-align:center; position: relative;">
       <button id="langToggleMain" class="ghost" style="position: absolute; top: 10px; right: 10px; padding: 6px 10px; font-size: 12px;" onclick="toggleLanguage()">🇹🇭 TH</button>
       <h1 style="margin:0; font-size: 28px; letter-spacing: 1px;">WEREWOLF</h1>
-      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.75</p>
+      <p style="color:var(--warning); margin-bottom: 15px;">Game Manager v5.76</p>
       <div style="display:flex; gap:8px;"><input id="groupName" placeholder="ชื่อกลุ่มเล่น..."><button class="primary" onclick="createGroup()">สร้าง</button></div>
       <button class="ghost" style="width:100%; margin-top:10px;" onclick="createTestGroup()">สร้างห้องทดสอบแบบเต็ม</button>
     </div>
@@ -240,7 +262,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   </div>
 </div>
 
-<div id="trialModal">
+<div id="trialModal" class="custom-modal">
   <div class="glass-panel" style="width:100%; text-align:center; max-width:350px;">
      <h2 style="color:var(--danger); margin-top:0;">ศาลตัดสินประหาร</h2>
      <h1 id="trialPlayerName" style="font-size:30px;">Name</h1>
@@ -252,7 +274,7 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   </div>
 </div>
 
-<div id="dayDeathModal">
+<div id="dayDeathModal" class="custom-modal">
   <div class="glass-panel" style="width:100%; text-align:center; max-width:350px; border:2px solid var(--danger);">
      <h2 style="color:var(--danger); margin-top:0;">ความตายต่อเนื่อง</h2>
      <div id="dayDeathSummary" style="font-size:16px; line-height:1.8;"></div>
@@ -260,18 +282,22 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
   </div>
 </div>
 
-<div id="nightSummaryModal">
-  <div class="glass-panel" style="width:100%; max-width:350px;">
-     <h2 style="color:var(--warning); text-align:center; margin-top:0;">สรุปเหตุการณ์เมื่อคืน</h2>
-     <div id="publicNightSummary" style="color:white; font-weight:bold; text-align:center; margin-bottom:15px; font-size:16px;"></div>
-     <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:15px; max-height: 250px; overflow-y: auto;">
+<div id="nightSummaryModal" class="custom-modal">
+  <div class="glass-panel" style="width:100%; max-width:400px; border:2px solid var(--warning);">
+     <h2 style="color:var(--warning); text-align:center; margin-top:0;">🌅 สรุปเหตุการณ์รุ่งเช้า</h2>
+     
+     <div id="publicNightSummary" class="summary-public"></div>
+     
+     <div class="summary-secret">
+         <h4 style="margin: 0 0 10px 0; color:white;">🤫 ข้อมูลลับเฉพาะ GM (ห้ามอ่าน)</h4>
          <ul id="secretNightSummary" style="margin:0; padding-left:20px; line-height:1.6; font-size: 14px;"></ul>
      </div>
+
      <button class="success" style="width:100%; margin-top:15px; font-size:16px;" onclick="closeNightSummary()">เริ่มต้นวันใหม่</button>
   </div>
 </div>
 
-<div id="hunterModal">
+<div id="hunterModal" class="custom-modal">
   <div class="glass-panel" style="width:100%; text-align:center; max-width:350px; border:2px solid var(--warning);">
      <h2 style="color:var(--warning); margin-top:0;">🏹 นายพรานล้างแค้น!</h2>
      <p style="font-size:14px; margin-bottom:15px;"><b id="hunterShooterName" style="color:var(--danger); font-size:18px;">Name</b> สิ้นใจแล้ว! <br>แต่ก่อนตายขอยิงศรลาก 1 คนไปลงนรกด้วย</p>
@@ -280,6 +306,28 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 </div>
 
 <script>
+// ================= 🚨 CUSTOM ALERT/CONFIRM LOGIC ================= //
+let gmAlertCallback = null;
+function showGmAlert(text, callback = null, title = "แจ้งเตือน") {
+    document.getElementById("gmAlertTitle").innerHTML = title;
+    document.getElementById("gmAlertText").innerHTML = text;
+    document.getElementById("gmAlertModal").classList.add("active");
+    gmAlertCallback = callback;
+}
+function closeGmAlert() {
+    document.getElementById("gmAlertModal").classList.remove("active");
+    if(gmAlertCallback) { gmAlertCallback(); gmAlertCallback = null; }
+}
+function showGmConfirm(text, onYes) {
+    document.getElementById("gmConfirmText").innerHTML = text;
+    document.getElementById("gmConfirmModal").classList.add("active");
+    document.getElementById("gmConfirmYes").onclick = () => { document.getElementById("gmConfirmModal").classList.remove("active"); onYes(); };
+}
+function closeGmConfirm() { document.getElementById("gmConfirmModal").classList.remove("active"); }
+function closeAllModals() { 
+    document.querySelectorAll('.custom-modal').forEach(m => m.classList.remove('active')); 
+}
+
 // ================= ⚙️ Language Logic ================= //
 let currentLang = 'TH';
 const roleNameTH={ villager:"🧑‍🌾 ชาวบ้าน", seer:"🔮 เทพพยากรณ์", witch:"🧙‍♀️ แม่มด", cupid:"💘 กามเทพ", bodyguard:"🛡️ บอดี้การ์ด", pacifist:"🕊️ ผู้รักสันติ", fool:"🤪 ไอ้ทึ่ม", prince:"👑 เจ้าชาย", hunter:"🏹 นายพราน", priest:"✞ นักบวช", sick:"🤢 ผู้ป่วยติดเชื้อ", mason:"🤝 เมสัน", wolf:"🐺 หมาป่า", wolf_cub:"🐕 ลูกหมาป่า", jester:"🃏 ยาจก", wolf_human:"🌓 ลูกครึ่งมนุษย์หมาป่า", tough_guy:"💪 หนุ่มถึก", elder:"👵 แม่เฒ่า", minion:"🎭 สมุนรับใช้", cult_leader:"🪬 เจ้าลัทธิ", lone_wolf:"🌑 หมาป่าเดียวดาย", thug:"👊 อันธพาล", hell_hound:"🔥 หมาป่าโลกันตร์", cursed:"🧟 ผู้ต้องสาป", drunk:"🍺 คนขี้เมา", wolf_man:"🕵️‍♂️ หมาป่ามนุษย์", vampire:"🧛🏻‍♀️ แวมไพร์" };
@@ -299,12 +347,7 @@ function toggleLanguage() {
 // ================= 🎵 Audio ================= //
 const wolfAudio = new Audio('wolf.mp3'); const alarmAudio = new Audio('alarm.mp3'); const morningAudio = new Audio('morning.mp3'); const bgmAudio = new Audio('bgm.mp3');
 const cardAudio = new Audio('card.mp3'); const shuffleAudio = new Audio('shuffle.mp3'); const winAudio = new Audio('win.mp3');
-
-const reloadAudio = new Audio('reload.mp3'); 
-const gunshotAudio = new Audio('gunshot.mp3'); 
-const blessAudio = new Audio('bless.mp3'); 
-const hiccupAudio = new Audio('hiccup.mp3'); 
-const gavelAudio = new Audio('gavel.mp3');
+const reloadAudio = new Audio('reload.mp3'); const gunshotAudio = new Audio('gunshot.mp3'); const blessAudio = new Audio('bless.mp3'); const hiccupAudio = new Audio('hiccup.mp3'); const gavelAudio = new Audio('gavel.mp3');
 
 bgmAudio.loop = true; bgmAudio.volume = 0.3; let isMuted = false;
 function toggleMute(){ isMuted = !isMuted; const icon = document.getElementById('bgmIcon'); if(isMuted){ bgmAudio.volume = 0; icon.innerText = "🔇"; } else { bgmAudio.volume = 0.3; icon.innerText = "🎵"; } }
@@ -315,55 +358,13 @@ function predictAll(){ const btn = document.getElementById('btnPredict'); if(btn
 
 // ================= 🏆 Win Dialogues ================= //
 const winMessages = {
-    village: [
-        { title: "☀️ แสงรุ่งอรุณแห่งความหวัง", desc: "เหล่าอสูรร้ายถูกกำจัดจนสิ้นซาก ความสงบสุขกลับคืนสู่หมู่บ้านอีกครั้ง" },
-        { title: "🕊️ ความสงบที่แลกด้วยชีวิต", desc: "ควันไฟจากการประหารมอดดับลง เมื่อไม่มีเสียงหอนข่มขวัญ ชาวเมืองจึงหลับตาลงได้เต็มตาสักที" },
-        { title: "🕯️ แสงเทียนที่ไม่มอดดับ", desc: "แม้จะสูญเสียผู้บริสุทธิ์ไปมากมาย แต่สุดท้ายมนุษยชาติก็เอาชนะสัญชาตญาณสัตว์ป่าได้สำเร็จ" },
-        { title: "🛡️ ชัยชนะของผู้เสียสละ", desc: "หมู่บ้านพ้นจากเงื้อมมือมัจจุราชได้ด้วยความกล้าหาญ บัดนี้วิญญาณของผู้ปกป้องสามารถพักผ่อนได้อย่างสงบ" },
-        { title: "🌅 รุ่งเช้าที่ไร้เสียงโหยหวน", desc: "ความหวาดกลัวสิ้นสุดลง ชาวบ้านร่วมกันเฉลิมฉลองชัยชนะเหนือความตายที่แฝงตัวอยู่ในเงามืด" },
-        { title: "⚖️ ความยุติธรรมเหนือเขี้ยวเล็บ", desc: "เราพิสูจน์แล้วว่า มนุษย์ผู้รวมใจกัน แข็งแกร่งกว่าอสูรที่กระหายเลือด" },
-        { title: "🤝 พลังแห่งมวลชน", desc: "แม้เราจะไร้พลังเวทมนตร์หรือคมเขี้ยว ความเชื่อมั่นซึ่งกันและกันได้นำทางเราผ่านค่ำคืนที่โหดร้าย" },
-        { title: "🌾 ผืนดินที่ได้รับการชำระ", desc: "เลือดของอสูรร้ายถูกชะล้างด้วยน้ำมือมนุษย์ บัดนี้ผืนดินพร้อมสำหรับการเริ่มต้นใหม่" },
-        { title: "✨ แสงสว่างชนะความมืด", desc: "ค่ำคืนอันยาวนานสิ้นสุดลง แสงแดดอันอบอุ่นแผ่ซ่านไปทั่วหมู่บ้าน" },
-        { title: "🏘️ หมู่บ้านที่เหลือเพียงเรา", desc: "ความสงบสุขกลับมาเยือน แต่เราจะจดจำชื่อของผู้ที่จากไปในฐานะวีรบุรุษตลอดกาล" }
-    ],
-    wolf: [
-        { title: "🌑 รัตติกาลที่ไม่มีวันสิ้นสุด", desc: "เสียงหอนสุดท้ายดังระงมไปทั่วหุบเขา เมื่อมนุษย์ไม่อาจต้านทานคมเขี้ยวได้" },
-        { title: "🐺 เสียงหอนแห่งผู้ชนะ", desc: "ไม่มีใครเหลือรอดไปบอกเล่าความจริง รอยเลือดบนหิมะคือสิ่งสุดท้ายที่เหลืออยู่" },
-        { title: "🩸 หมู่บ้านสีเลือด", desc: "คมเขี้ยวแหลมคมได้ทำหน้าที่ของมันแล้ว กลิ่นคาวเลือดคละคลุ้งไปทั่วทุกหลังคาเรือน" },
-        { title: "🌙 จันทร์ฉายเหนือซากศพ", desc: "แสงจันทร์สีเงินเป็นพยานถึงงานเลี้ยงที่ยิ่งใหญ่ ความอ่อนแอของมนุษย์ถูกกำจัดทิ้งไป" },
-        { title: "🐾 รอยเท้าอสูรบนกองกระดูก", desc: "ความพยายามดิ้นรนช่างน่าขัน มนุษย์เป็นเพียงเหยื่อที่ถูกลิขิตมาให้เป็นอาหาร" },
-        { title: "💀 จุดจบของยุคสมัยมนุษย์", desc: "อารยธรรมพังทลายลงในคืนเดียว บัดนี้สัตว์ป่าคือผู้กุมอำนาจแต่เพียงผู้เดียว" },
-        { title: "🍗 งานเลี้ยงใต้อุ้งเท้า", desc: "เนื้อสดที่หวานหอมคือรางวัลของผู้ชนะ ความหวาดกลัวในดวงตาพวกเจ้าคือเครื่องเคียงที่อร่อยที่สุด" },
-        { title: "🌫️ เงาที่กลืนกินแสงอาทิตย์", desc: "จะไม่มีพรุ่งนี้สำหรับหมู่บ้านนี้อีกต่อไป ความมืดได้ปกคลุมจิตวิญญาณทุกดวง" },
-        { title: "⛓️ พันธนาการแห่งสัญชาตญาณ", desc: "เสียงกรีดร้องคือเสียงเพลงประกอบความสำเร็จ กลิ่นคาวเลือดคืออิสรภาพ" },
-        { title: "🥀 ความตายในอ้อมกอดหมาป่า", desc: "อย่าร้องไห้เลยมนุษย์ที่น่าสงสาร ความตายด้วยคมเขี้ยวของเราคือเกียรติสูงสุดของเจ้า" }
-    ],
-    lone_wolf: [
-        { title: "🗡️ ผู้ทรยศเพียงหนึ่งเดียว", desc: "เหลือเพียงเขาผู้เดียวที่ยืนหยัดอยู่บนกองภูเขาเลากา" },
-        { title: "🐺 ราชาหมาป่าที่แท้จริง", desc: "ไม่ต้องมีฝูง ข้าก็คือผู้ล่าที่แข็งแกร่งที่สุดในป่านี้!" },
-        { title: "🩸 ชัยชนะบนซากศพพี่น้อง", desc: "การหักหลังคือความหอมหวาน บัดนี้ข้าคือหมาป่าตัวสุดท้าย" }
-    ],
-    jester: [
-        { title: "🎭 เสียงหัวเราะของคนบ้า", desc: "ชัยชนะนี้เป็นของข้าแต่เพียงผู้เดียว!" },
-        { title: "🃏 แผนลวงสมบูรณ์แบบ", desc: "พวกเจ้าช่างโง่เขลานักที่โหวตข้าออก สมใจอยากข้าล่ะ!" },
-        { title: "🎪 ผู้ชนะบนลานประหาร", desc: "เชือกแขวนคอเส้นนี้คือรางวัลที่ข้าเฝ้ารอมาตลอด!" }
-    ],
-    cult: [
-        { title: "👁️ บัญชาแห่งศาสดาหน้ามืด", desc: "จงก้มกราบแทบบาทศาสดา!" },
-        { title: "🪬 โลกใบใหม่ในกำมือ", desc: "ไม่มีใครต่อต้านศรัทธาของเราได้ ทุกคนคือสาวกของข้า!" },
-        { title: "🕯️ แสงสว่างจอมปลอม", desc: "พวกเจ้าถูกล้างสมองโดยสมบูรณ์ บัดนี้ลัทธิของเราคือผู้ปกครอง" }
-    ],
-    thug: [
-        { title: "🩸 บัญชีเลือดถูกชำระ", desc: "เขาหายตัวไปในเงามืดพร้อมชัยชนะที่ไม่มีใครคาดคิด" },
-        { title: "👊 หมัดเหล็กสั่งตาย", desc: "เป้าหมายทั้งหมดถูกส่งลงนรก ภารกิจของนักฆ่าสำเร็จแล้ว!" },
-        { title: "💰 รับเงินค่างวด", desc: "ไม่มีเป้าหมายไหนที่ข้าล็อกไว้แล้วจะรอดไปได้ งานนี้รับเละ!" }
-    ],
-    vampire: [
-        { title: "🧛🏻‍♀️ อาณาจักรแห่งรัตติกาล", desc: "ทุกหยดเลือดถูกสูบกินจนเหือดแห้ง บัดนี้มีเพียงแวมไพร์ที่เป็นอมตะเหนือทุกคน!" },
-        { title: "🍷 งานเลี้ยงโลหิต", desc: "เลือดของชาวบ้านและหมาป่าช่างหอมหวาน คืนนี้เป็นของพวกเราตลอดไป!" },
-        { title: "🦇 คืนชีพผู้เป็นอมตะ", desc: "ไม่มียาพิษหรือคมเขี้ยวใดทำลายพวกเราได้ อารยธรรมใหม่เริ่มต้นขึ้นแล้ว!" }
-    ]
+    village: [{ title: "☀️ แสงรุ่งอรุณแห่งความหวัง", desc: "เหล่าอสูรร้ายถูกกำจัดจนสิ้นซาก ความสงบสุขกลับคืนสู่หมู่บ้านอีกครั้ง" }, { title: "🕊️ ความสงบที่แลกด้วยชีวิต", desc: "ควันไฟจากการประหารมอดดับลง เมื่อไม่มีเสียงหอนข่มขวัญ ชาวเมืองจึงหลับตาลงได้เต็มตาสักที" }, { title: "🕯️ แสงเทียนที่ไม่มอดดับ", desc: "แม้จะสูญเสียผู้บริสุทธิ์ไปมากมาย แต่สุดท้ายมนุษยชาติก็เอาชนะสัญชาตญาณสัตว์ป่าได้สำเร็จ" }, { title: "🛡️ ชัยชนะของผู้เสียสละ", desc: "หมู่บ้านพ้นจากเงื้อมมือมัจจุราชได้ด้วยความกล้าหาญ บัดนี้วิญญาณของผู้ปกป้องสามารถพักผ่อนได้อย่างสงบ" }, { title: "🌅 รุ่งเช้าที่ไร้เสียงโหยหวน", desc: "ความหวาดกลัวสิ้นสุดลง ชาวบ้านร่วมกันเฉลิมฉลองชัยชนะเหนือความตายที่แฝงตัวอยู่ในเงามืด" }, { title: "⚖️ ความยุติธรรมเหนือเขี้ยวเล็บ", desc: "เราพิสูจน์แล้วว่า มนุษย์ผู้รวมใจกัน แข็งแกร่งกว่าอสูรที่กระหายเลือด" }, { title: "🤝 พลังแห่งมวลชน", desc: "แม้เราจะไร้พลังเวทมนตร์หรือคมเขี้ยว ความเชื่อมั่นซึ่งกันและกันได้นำทางเราผ่านค่ำคืนที่โหดร้าย" }, { title: "🌾 ผืนดินที่ได้รับการชำระ", desc: "เลือดของอสูรร้ายถูกชะล้างด้วยน้ำมือมนุษย์ บัดนี้ผืนดินพร้อมสำหรับการเริ่มต้นใหม่" }, { title: "✨ แสงสว่างชนะความมืด", desc: "ค่ำคืนอันยาวนานสิ้นสุดลง แสงแดดอันอบอุ่นแผ่ซ่านไปทั่วหมู่บ้าน" }, { title: "🏘️ หมู่บ้านที่เหลือเพียงเรา", desc: "ความสงบสุขกลับมาเยือน แต่เราจะจดจำชื่อของผู้ที่จากไปในฐานะวีรบุรุษตลอดกาล" }],
+    wolf: [{ title: "🌑 รัตติกาลที่ไม่มีวันสิ้นสุด", desc: "เสียงหอนสุดท้ายดังระงมไปทั่วหุบเขา เมื่อมนุษย์ไม่อาจต้านทานคมเขี้ยวได้" }, { title: "🐺 เสียงหอนแห่งผู้ชนะ", desc: "ไม่มีใครเหลือรอดไปบอกเล่าความจริง รอยเลือดบนหิมะคือสิ่งสุดท้ายที่เหลืออยู่" }, { title: "🩸 หมู่บ้านสีเลือด", desc: "คมเขี้ยวแหลมคมได้ทำหน้าที่ของมันแล้ว กลิ่นคาวเลือดคละคลุ้งไปทั่วทุกหลังคาเรือน" }, { title: "🌙 จันทร์ฉายเหนือซากศพ", desc: "แสงจันทร์สีเงินเป็นพยานถึงงานเลี้ยงที่ยิ่งใหญ่ ความอ่อนแอของมนุษย์ถูกกำจัดทิ้งไป" }, { title: "🐾 รอยเท้าอสูรบนกองกระดูก", desc: "ความพยายามดิ้นรนช่างน่าขัน มนุษย์เป็นเพียงเหยื่อที่ถูกลิขิตมาให้เป็นอาหาร" }, { title: "💀 จุดจบของยุคสมัยมนุษย์", desc: "อารยธรรมพังทลายลงในคืนเดียว บัดนี้สัตว์ป่าคือผู้กุมอำนาจแต่เพียงผู้เดียว" }, { title: "🍗 งานเลี้ยงใต้อุ้งเท้า", desc: "เนื้อสดที่หวานหอมคือรางวัลของผู้ชนะ ความหวาดกลัวในดวงตาพวกเจ้าคือเครื่องเคียงที่อร่อยที่สุด" }, { title: "🌫️ เงาที่กลืนกินแสงอาทิตย์", desc: "จะไม่มีพรุ่งนี้สำหรับหมู่บ้านนี้อีกต่อไป ความมืดได้ปกคลุมจิตวิญญาณทุกดวง" }, { title: "⛓️ พันธนาการแห่งสัญชาตญาณ", desc: "เสียงกรีดร้องคือเสียงเพลงประกอบความสำเร็จ กลิ่นคาวเลือดคืออิสรภาพ" }, { title: "🥀 ความตายในอ้อมกอดหมาป่า", desc: "อย่าร้องไห้เลยมนุษย์ที่น่าสงสาร ความตายด้วยคมเขี้ยวของเราคือเกียรติสูงสุดของเจ้า" }],
+    lone_wolf: [{ title: "🗡️ ผู้ทรยศเพียงหนึ่งเดียว", desc: "เหลือเพียงเขาผู้เดียวที่ยืนหยัดอยู่บนกองภูเขาเลากา" }, { title: "🐺 ราชาหมาป่าที่แท้จริง", desc: "ไม่ต้องมีฝูง ข้าก็คือผู้ล่าที่แข็งแกร่งที่สุดในป่านี้!" }, { title: "🩸 ชัยชนะบนซากศพพี่น้อง", desc: "การหักหลังคือความหอมหวาน บัดนี้ข้าคือหมาป่าตัวสุดท้าย" }],
+    jester: [{ title: "🎭 เสียงหัวเราะของคนบ้า", desc: "ชัยชนะนี้เป็นของข้าแต่เพียงผู้เดียว!" }, { title: "🃏 แผนลวงสมบูรณ์แบบ", desc: "พวกเจ้าช่างโง่เขลานักที่โหวตข้าออก สมใจอยากข้าล่ะ!" }, { title: "🎪 ผู้ชนะบนลานประหาร", desc: "เชือกแขวนคอเส้นนี้คือรางวัลที่ข้าเฝ้ารอมาตลอด!" }],
+    cult: [{ title: "👁️ บัญชาแห่งศาสดาหน้ามืด", desc: "จงก้มกราบแทบบาทศาสดา!" }, { title: "🪬 โลกใบใหม่ในกำมือ", desc: "ไม่มีใครต่อต้านศรัทธาของเราได้ ทุกคนคือสาวกของข้า!" }, { title: "🕯️ แสงสว่างจอมปลอม", desc: "พวกเจ้าถูกล้างสมองโดยสมบูรณ์ บัดนี้ลัทธิของเราคือผู้ปกครอง" }],
+    thug: [{ title: "🩸 บัญชีเลือดถูกชำระ", desc: "เขาหายตัวไปในเงามืดพร้อมชัยชนะที่ไม่มีใครคาดคิด" }, { title: "👊 หมัดเหล็กสั่งตาย", desc: "เป้าหมายทั้งหมดถูกส่งลงนรก ภารกิจของนักฆ่าสำเร็จแล้ว!" }, { title: "💰 รับเงินค่างวด", desc: "ไม่มีเป้าหมายไหนที่ข้าล็อกไว้แล้วจะรอดไปได้ งานนี้รับเละ!" }],
+    vampire: [{ title: "🧛🏻‍♀️ อาณาจักรแห่งรัตติกาล", desc: "ทุกหยดเลือดถูกสูบกินจนเหือดแห้ง บัดนี้มีเพียงแวมไพร์ที่เป็นอมตะเหนือทุกคน!" }, { title: "🍷 งานเลี้ยงโลหิต", desc: "เลือดของชาวบ้านและหมาป่าช่างหอมหวาน คืนนี้เป็นของพวกเราตลอดไป!" }, { title: "🦇 คืนชีพผู้เป็นอมตะ", desc: "ไม่มียาพิษหรือคมเขี้ยวใดทำลายพวกเราได้ อารยธรรมใหม่เริ่มต้นขึ้นแล้ว!" }]
 };
 function getRandomWinMessage(type) { return winMessages[type][Math.floor(Math.random() * winMessages[type].length)]; }
 
@@ -400,7 +401,7 @@ function addLog(msg, isHeader = false){ const time = new Date().toLocaleTimeStri
 function calculateBalance() { let score = 0; players.forEach(p => score += roleBalanceValues[p.role] || 0); document.getElementById("totalBalanceScore").innerText = score > 0 ? "+" + score : score; }
 function createGroup(){ const name = groupName.value; if(!name) return; groups.push({name: name, players: []}); save(); renderGroups(); groupName.value = ""; }
 function createTestGroup() { const testPlayers = Object.keys(roleNameTH).slice(0,23).map(roleKey => ({ name: roleNameTH[roleKey].split(" ")[1], role: roleKey, alive: true, isCult: false, silenced: false, toughGuyBleeding: false })); groups.push({name: "ห้องทดสอบแบบเต็ม", players: testPlayers}); save(); renderGroups(); }
-function deleteGroup(i) { if(confirm(`คุณต้องการลบกลุ่ม "${groups[i].name}" ใช่หรือไม่?`)) { groups.splice(i, 1); save(); renderGroups(); } }
+function deleteGroup(i) { showGmConfirm(`คุณต้องการลบกลุ่ม "${groups[i].name}" ใช่หรือไม่?`, () => { groups.splice(i, 1); save(); renderGroups(); }); }
 
 function renderGroups(){ 
     groupList.innerHTML = groups.map((g, i) => `
@@ -412,9 +413,34 @@ function renderGroups(){
 }
 function openGroup(i){ currentGroup = i; players = JSON.parse(JSON.stringify(groups[i].players || [])); document.getElementById("groupScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); renderSetup(); }
 function backToGroup(){ groups[currentGroup].players = players; save(); document.getElementById("setupScreen").classList.add("hidden"); document.getElementById("groupScreen").classList.remove("hidden"); }
+
+// ================= 🛠️ Auto-Rename Feature =================
 function addPlayer(){ players.push({name:"ผู้เล่น "+(players.length+1), role:"villager", alive:true, isCult:false, silenced:false, toughGuyBleeding:false}); renderSetup(); }
 function removePlayer(i){ players.splice(i, 1); renderSetup(); }
-function handleRoleChange(index, newRole) { if (uniqueRoles.includes(newRole) && players.some((p, i) => i !== index && p.role === newRole)) { alert(`บทบาท ${getRoleName(newRole)} มีได้เพียงคนเดียว!`); renderSetup(); return; } players[index].role = newRole; calculateBalance(); }
+
+function handleRoleChange(index, newRole) { 
+    if (uniqueRoles.includes(newRole) && players.some((p, i) => i !== index && p.role === newRole)) { 
+        showGmAlert(`บทบาท ${getRoleName(newRole)} มีได้เพียงคนเดียว!`); 
+        renderSetup(); 
+        return; 
+    } 
+    
+    let p = players[index];
+    let oldRoleNameTH = roleNameTH[p.role].split(" ")[1];
+    let oldRoleNameEN = roleNameEN[p.role].split(" ")[1];
+    
+    p.role = newRole; 
+
+    // เช็คว่าผู้เล่นยังใช้ชื่อตั้งต้น หรือใช้ชื่อบทบาทเดิมอยู่หรือไม่
+    let isDefaultName = /^ผู้เล่น \d+$/.test(p.name) || /^Player \d+$/.test(p.name);
+    if (isDefaultName || p.name === oldRoleNameTH || p.name === oldRoleNameEN) {
+        // เปลี่ยนชื่อเป็นชื่อของบทบาทใหม่ให้อัตโนมัติ
+        p.name = getRoleName(newRole).split(" ")[1];
+    }
+
+    calculateBalance(); 
+    renderSetup(); 
+}
 
 function renderSetup(){ 
     setupPlayers.innerHTML = players.map((p, i) => `
@@ -434,7 +460,7 @@ function renderSetup(){
 function togglePrivacy() { isPrivacyMode = !isPrivacyMode; document.getElementById("gamePlayers").className = isPrivacyMode ? "role-hidden" : ""; document.getElementById("togglePrivacy").innerText = isPrivacyMode ? "👁️ แสดงบท" : "👁️ ซ่อนบท"; renderGame(); }
 
 function startGame(){
-    if(players.length < 3){ alert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
+    if(players.length < 3){ showGmAlert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
     
     // --- บันทึกรายชื่อและบทบาทลงฐานข้อมูลก่อนเริ่มเกม ---
     if(currentGroup !== null) {
@@ -481,7 +507,7 @@ function renderHellHoundSelect(){ let btns = players.map((p,i) => p.role === 'he
 
 function startCustomTimer() {
     if(document.activeElement) document.activeElement.blur(); const minVal = document.getElementById('timerMins').value; const secVal = document.getElementById('timerSecs').value; let t = (parseInt(minVal) || 0) * 60 + (parseInt(secVal) || 0);
-    if(t <= 0) { alert("⚠️ กรุณาระบุเวลาให้ถูกต้องก่อนเริ่มจับเวลาครับ"); document.getElementById('timerMins').value = 3; return; }
+    if(t <= 0) { showGmAlert("⚠️ กรุณาระบุเวลาให้ถูกต้องก่อนเริ่มจับเวลาครับ"); document.getElementById('timerMins').value = 3; return; }
     if(!isPrivacyMode) togglePrivacy(); document.getElementById('fullScreenTimer').classList.add('active'); clearInterval(timerInterval); timeRemaining = t; updateTimerDisp(); try { alarmAudio.play().then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; }).catch(e => {}); } catch(e){}
     timerInterval = setInterval(() => { timeRemaining--; if(timeRemaining <= 0) { clearInterval(timerInterval); try { alarmAudio.play(); } catch(e){} } updateTimerDisp(); }, 1000);
 }
@@ -498,20 +524,27 @@ function verdict(isGuilty) {
     // 🎧 เสียงเคาะบัลลังก์ศาล ป๊อกๆ
     try { gavelAudio.currentTime = 0; gavelAudio.play(); } catch(e){} 
 
+    // 🛠️ แก้บั๊กหน้าต่างโหวตค้าง: ปิด Modal ก่อนโชว์ Alert
     if(priestBlessedTarget === i) {
         addLog(`✞ ปาฏิหาริย์! พรนักบวชคุ้มครอง ${players[i].name}`);
-        alert(`ปาฏิหาริย์! ${players[i].name} ได้รับพรจากนักบวช เขารอดชีวิตจากการประหารครั้งนี้!`);
         priestBlessedTarget = null; 
-        closeTrial(); renderGame(); return;
+        closeTrial(); // ปิดหน้าต่างศาลทันที
+        showGmAlert(`ปาฏิหาริย์! ${players[i].name} ได้รับพรจากนักบวช รอดชีวิตจากการประหารครั้งนี้!`, () => {
+            renderGame(); 
+        }, "✞ ปาฏิหาริย์!");
+        return;
     }
     
     if(players[i].role === 'fool') addLog(`🤪 ${players[i].name} ไอ้ทึ่มถูกแขวนคอแล้ว!`); 
     
     if(players[i].role === 'prince') { 
         addLog(`👑 ${players[i].name} เปิดเผยตัวว่าเป็น "เจ้าชาย" รอดจากการถูกประหาร!`); 
-        alert(`ประกาศราชโองการ! ${players[i].name} คือเจ้าชาย! เขาจะรอดชีวิตจากการประหารครั้งนี้!`); 
         players[i].role = 'villager'; 
-        closeTrial(); renderGame(); return; 
+        closeTrial(); // ปิดหน้าต่างศาลทันที
+        showGmAlert(`ประกาศราชโองการ! ${players[i].name} คือเจ้าชาย! เขาจะรอดชีวิตจากการประหารครั้งนี้!`, () => {
+            renderGame(); 
+        }, "👑 พระราชโองการ");
+        return; 
     }
     
     deadThisVote.push(players[i].name); players[i].alive = false; lastKilledByVote = i; 
@@ -555,19 +588,26 @@ function updateHunterModalUI() {
 }
 function fireHunterShot() {
     if (selectedHunterTarget === null) return;
+    
+    // ปิดหน้าต่างนายพรานทันที เพื่อป้องกันกดซ้ำ
+    document.getElementById("hunterModal").classList.remove("active"); 
+
     try { gunshotAudio.currentTime = 0; gunshotAudio.play(); } catch(e){} // 🎧 เสียงยิงปืน
     let t = selectedHunterTarget;
     players[t].alive = false;
     addLog(`🏹 ${players[currentHunterIndex].name} ยิง ${players[t].name} ตายตามไป!`);
-    alert(`ฉึก! ${players[currentHunterIndex].name} ลั่นศรยิง ${players[t].name} ตายตกไปตามกัน!`);
     deadThisVote.push(players[t].name); 
     
-    if(players[t].role === 'wolf_cub') wolfBuff = true; 
-    if(players[t].role === 'hunter' && !pendingHunters.includes(t)) pendingHunters.push(t);
-    checkDeathLinks(t, false);
+    let msg = `ฉึก ๆ! <br><b style="color:var(--danger)">${players[currentHunterIndex].name}</b> ลมหายใจเฮือกสุดท้ายลั่นไกปืนยิง <b style="color:var(--danger)">${players[t].name}</b> ตายตกไปตามกัน!`;
     
-    if(checkWinCondition()) return;
-    processPendingHunters(); 
+    showGmAlert(msg, () => {
+        if(players[t].role === 'wolf_cub') wolfBuff = true; 
+        if(players[t].role === 'hunter' && !pendingHunters.includes(t)) pendingHunters.push(t);
+        checkDeathLinks(t, false);
+        
+        if(checkWinCondition()) return;
+        processPendingHunters(); 
+    }, "🏹 ศรล้างแค้น!");
 }
 
 function startNight() { 
@@ -575,24 +615,6 @@ function startNight() {
     deadThisNight = []; silencedThisNight = []; secretLogs = []; deadThisVote = []; dayCount++; addLog(`คืนวันที่ ${dayCount - 1}`, true); nightStep = 0; nightKillTargets = []; nightGuardTarget = null; elderSilenceTarget = null; cultRecruits = []; lastKilledByVote = null; makeWolvesSickNextNight = false;
     
     witchAction = null; witchPoisonTarget = null; vampireKillTarget = null;
-    
-    if (dayCount - 1 === 3) {
-        let drunkSobered = false;
-        players.forEach(p => {
-            if (p.role === 'drunk' && p.alive) {
-                drunkSobered = true;
-                const drunkRoles = ['vampire', 'hunter', 'wolf', 'villager', 'villager', 'villager', 'hunter'];
-                const newRole = drunkRoles[Math.floor(Math.random() * drunkRoles.length)];
-                p.role = newRole;
-                alert(`🍺 คนขี้เมา (${p.name}) สร่างเมาแล้ว!\nบทบาทที่แท้จริงคือ: ${getRoleName(newRole)}`);
-                addLog(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
-                secretLogs.push(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
-            }
-        });
-        if (drunkSobered) {
-            try { hiccupAudio.currentTime = 0; hiccupAudio.play(); } catch(e){} // 🎧 เสียงเรอคนขี้เมา
-        }
-    }
     
     players.forEach(p => p.silenced = false); runNight(); 
 }
@@ -630,7 +652,10 @@ function renderNightRole(type) {
         const nameClass = ""; 
         
         if(type === "wolf") { const limit = wolfBuff ? 2 : 1; sel = nightKillTargets.includes(i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="if(nightKillTargets.includes(${i})) nightKillTargets=nightKillTargets.filter(x=>x!==${i}); else if(nightKillTargets.length<${limit}) nightKillTargets.push(${i}); renderNightRole('wolf')">${sel?'ยกเลิก':'เลือก'}</button>`; }
-        else if(type === "vampire") { sel = (vampireKillTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="vampireKillTarget=${sel ? 'null' : i}; renderNightRole('vampire')">${sel?'ยกเลิก':'สูบเลือด'}</button>`; }
+        else if(type === "vampire") { 
+            if (p.role === 'vampire') return ""; // แวมไพร์ห้ามกัดตัวเอง
+            sel = (vampireKillTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="vampireKillTarget=${sel ? 'null' : i}; renderNightRole('vampire')">${sel?'ยกเลิก':'สูบเลือด'}</button>`; 
+        }
         else if(type === "seer") { 
             const isWolfTeam = ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_human'].includes(p.role); 
             const isVampire = (p.role === 'vampire');
@@ -651,17 +676,25 @@ function renderNightRole(type) {
         }
         else if(type === "bodyguard") { sel = (nightGuardTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" ${lastGuardTarget === i ? 'disabled' : ''} onclick="nightGuardTarget=${sel ? 'null' : i}; renderNightRole('bodyguard')">${lastGuardTarget === i ? 'ห้ามซ้ำ' : (sel ? 'ยกเลิก' : 'ปกป้อง')}</button>`; }
         else if(type === "witch" && p.alive && !witchUsed) { 
+            if (p.role === 'witch') return ""; // แม่มดห้ามสาดพิษใส่ตัวเอง
             if(witchPoisonTarget === i) { sel = true; btn = `<button class="warning" style="color:black" onclick="witchAction=null; witchPoisonTarget=null; renderNightRole('witch')">ยกเลิก</button>`; }
             else if(witchAction !== 'heal') { btn = `<button class="danger" style="color:white" onclick="witchAction='poison'; witchPoisonTarget=${i}; renderNightRole('witch')">ยาพิษ</button>`; }
         }
         else if(type === "elder") { sel = (elderSilenceTarget === i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="elderSilenceTarget=${sel ? 'null' : i}; renderNightRole('elder')">${sel ? 'ยกเลิก' : 'เนรเทศ'}</button>`; }
-        else if(type === "cult_leader" && !p.isCult) { sel = cultRecruits.includes(i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="cultRecruits=${sel ? '[]' : '['+i+']'}; renderNightRole('cult_leader')">${sel ? 'ยกเลิก' : 'ชวน'}</button>`; }
+        else if(type === "cult_leader" && !p.isCult && p.role !== 'cult_leader') { sel = cultRecruits.includes(i); btn = `<button class="${sel ? 'warning' : 'primary'}" style="color:${sel?'black':'white'}" onclick="cultRecruits=${sel ? '[]' : '['+i+']'}; renderNightRole('cult_leader')">${sel ? 'ยกเลิก' : 'ชวน'}</button>`; }
         return `<div class="game-card ${sel ? 'selected-card' : ''} ${!p.alive ? 'dead' : ''}"><b class="${nameClass}">${p.name}</b>${btn}</div>`;
     }).join("") + `</div>`;
     
     if(type === "witch") { 
+        let witchSelfKilled = nightKillTargets.some(idx => players[idx].role === 'witch');
         if(witchUsed) html += `<div style="text-align:center; padding:12px; color:#94a3b8;">(ยาถูกใช้ไปแล้ว)</div>`; 
-        else if(nightKillTargets.length > 0 && witchPoisonTarget === null) html += `<button class="${witchAction === 'heal' ? 'warning' : 'success'}" style="width:100%; margin-top:12px; color:${witchAction === 'heal' ? 'black' : 'white'}" onclick="witchAction=${witchAction === 'heal' ? 'null' : "'heal'"}; renderNightRole('witch')">${witchAction === 'heal' ? 'ยกเลิกการใช้ยาชุบ' : 'ใช้ยาชุบชีวิต'}</button>`; 
+        else if(nightKillTargets.length > 0 && witchPoisonTarget === null) {
+            if (witchSelfKilled) {
+                html += `<button class="ghost" disabled style="width:100%; margin-top:12px; opacity:0.5;">ห้ามใช้ยาชุบตัวเอง</button>`;
+            } else {
+                html += `<button class="${witchAction === 'heal' ? 'warning' : 'success'}" style="width:100%; margin-top:12px; color:${witchAction === 'heal' ? 'black' : 'white'}" onclick="witchAction=${witchAction === 'heal' ? 'null' : "'heal'"}; renderNightRole('witch')">${witchAction === 'heal' ? 'ยกเลิกการใช้ยาชุบ' : 'ใช้ยาชุบชีวิต'}</button>`; 
+            }
+        }
     }
     
     let nextBtnText = "ยืนยัน";
@@ -677,15 +710,15 @@ function resolveNight() {
     players.forEach((p, i) => { if(p.alive && p.toughGuyBleeding) { p.alive = false; deadThisNight.push(p.name); secretLogs.push(`${p.name} ทนพิษบาดแผลไม่ไหว (หนุ่มถึก)`); addLog(`${p.name} ทนพิษบาดแผลไม่ไหว`); if(p.role === 'wolf_cub') wolfBuff = true; if(p.role === 'hunter' && !pendingHunters.includes(i)) pendingHunters.push(i); checkDeathLinks(i, true); p.toughGuyBleeding = false; } });
     
     nightKillTargets.forEach(t => { 
-        if(t === nightGuardTarget) { secretLogs.push(`บอดี้การ์ดปกป้อง ${players[t].name} สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[t].name}`); } 
+        if(t === nightGuardTarget) { secretLogs.push(`🛡️ บอดี้การ์ดปกป้อง ${players[t].name} สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[t].name}`); } 
         else if (players[t].role === 'cursed') { players[t].role = 'wolf'; secretLogs.push(`🧟 ${players[t].name} ถูกกัด! คำสาปทำงาน กลายร่างเป็นหมาป่า`); addLog(`🧟 ${players[t].name} คำสาปกำเริบ!`); }
         else if (players[t].role === 'vampire') { secretLogs.push(`🧛🏻‍♀️ หมาป่าพยายามกัด ${players[t].name} แต่เขาคือแวมไพร์ (ไม่ตาย)`); addLog(`หมาป่ากัด ${players[t].name} ไม่เข้า`); }
-        else if(witchAction === 'heal') { secretLogs.push(`แม่มดชุบชีวิต ${players[t].name} สำเร็จ`); addLog(`แม่มดช่วย ${players[t].name}`); } 
+        else if(witchAction === 'heal') { secretLogs.push(`🧪 แม่มดชุบชีวิต ${players[t].name} สำเร็จ`); addLog(`แม่มดช่วย ${players[t].name}`); } 
         else { 
             if(players[t].role === 'sick') makeWolvesSickNextNight = true;
-            if(players[t].role === 'tough_guy' && !players[t].toughGuyBleeding) { players[t].toughGuyBleeding = true; secretLogs.push(`${players[t].name} บาดเจ็บสาหัสจากการโดนกัด (หนุ่มถึก)`); addLog(`${players[t].name} บาดเจ็บ`); } 
+            if(players[t].role === 'tough_guy' && !players[t].toughGuyBleeding) { players[t].toughGuyBleeding = true; secretLogs.push(`🩸 ${players[t].name} บาดเจ็บสาหัสจากการโดนกัด (หนุ่มถึก)`); addLog(`${players[t].name} บาดเจ็บ`); } 
             else if(players[t].alive) { 
-                players[t].alive = false; deadThisNight.push(players[t].name); secretLogs.push(`${players[t].name} ถูกหมาป่าสังหาร`); addLog(`${players[t].name} ถูกฆ่า`); 
+                players[t].alive = false; deadThisNight.push(players[t].name); secretLogs.push(`🐺 ${players[t].name} ถูกหมาป่าสังหาร`); addLog(`${players[t].name} ถูกฆ่า`); 
                 if(players[t].role === 'wolf_cub') wolfBuff = true; 
                 if(players[t].role === 'hunter' && !pendingHunters.includes(t)) pendingHunters.push(t);
                 checkDeathLinks(t, true); 
@@ -696,12 +729,12 @@ function resolveNight() {
     if (vampireKillTarget !== null) {
         let vt = vampireKillTarget;
         if (vt === nightGuardTarget) {
-            secretLogs.push(`บอดี้การ์ดปกป้อง ${players[vt].name} จากแวมไพร์ สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[vt].name}`);
+            secretLogs.push(`🛡️ บอดี้การ์ดปกป้อง ${players[vt].name} จากแวมไพร์ สำเร็จ`); addLog(`บอดี้การ์ดช่วย ${players[vt].name}`);
         } else {
             if (players[vt].role === 'tough_guy' && !players[vt].toughGuyBleeding) {
-                players[vt].toughGuyBleeding = true; secretLogs.push(`${players[vt].name} บาดเจ็บสาหัสจากการถูกสูบเลือด (หนุ่มถึก)`); addLog(`${players[vt].name} บาดเจ็บ`);
+                players[vt].toughGuyBleeding = true; secretLogs.push(`🩸 ${players[vt].name} บาดเจ็บสาหัสจากการถูกสูบเลือด (หนุ่มถึก)`); addLog(`${players[vt].name} บาดเจ็บ`);
             } else if (players[vt].alive) {
-                players[vt].alive = false; deadThisNight.push(players[vt].name); secretLogs.push(`${players[vt].name} ถูกแวมไพร์สูบเลือดจนตาย`); addLog(`${players[vt].name} ถูกสูบเลือด`);
+                players[vt].alive = false; deadThisNight.push(players[vt].name); secretLogs.push(`🧛🏻‍♀️ ${players[vt].name} ถูกแวมไพร์สูบเลือดจนตาย`); addLog(`${players[vt].name} ถูกสูบเลือด`);
                 if(players[vt].role === 'wolf_cub') wolfBuff = true; 
                 if(players[vt].role === 'hunter' && !pendingHunters.includes(vt)) pendingHunters.push(vt);
                 checkDeathLinks(vt, true);
@@ -710,13 +743,13 @@ function resolveNight() {
     }
     
     if(witchAction === 'poison' && witchPoisonTarget !== null) { 
-        let pt = witchPoisonTarget; players[pt].alive = false; deadThisNight.push(players[pt].name); secretLogs.push(`${players[pt].name} ถูกยาพิษแม่มดสังหาร`); addLog(`${players[pt].name} โดนยาพิษ`); 
+        let pt = witchPoisonTarget; players[pt].alive = false; deadThisNight.push(players[pt].name); secretLogs.push(`🧪 ${players[pt].name} ถูกยาพิษแม่มดสังหาร`); addLog(`${players[pt].name} โดนยาพิษ`); 
         if(players[pt].role === 'wolf_cub') wolfBuff = true; 
         if(players[pt].role === 'hunter' && !pendingHunters.includes(pt)) pendingHunters.push(pt);
         checkDeathLinks(pt, true); 
     }
     
-    if(elderSilenceTarget !== null) { players[elderSilenceTarget].silenced = true; silencedThisNight.push(players[elderSilenceTarget].name); secretLogs.push(`${players[elderSilenceTarget].name} ถูกแม่เฒ่าเนรเทศให้งดโหวต`); }
+    if(elderSilenceTarget !== null) { players[elderSilenceTarget].silenced = true; silencedThisNight.push(players[elderSilenceTarget].name); secretLogs.push(`👵 ${players[elderSilenceTarget].name} ถูกแม่เฒ่าเนรเทศให้งดโหวต`); }
     cultRecruits.forEach(i => { 
         if (players[i].role === 'vampire') {
             secretLogs.push(`🪬 เจ้าลัทธิพยายามชวน ${players[i].name} แต่ล้มเหลวเพราะเขาคือแวมไพร์`);
@@ -730,13 +763,47 @@ function resolveNight() {
     if (makeWolvesSickNextNight) wolvesSick = true; 
     if (wolfBuffUsed) { wolfBuff = false; wolfBuffUsed = false; }
     
-    let publicMsg = deadThisNight.length ? "ผู้ตาย: <br>" + deadThisNight.join("<br>") : "เมื่อคืนไม่มีคนตาย";
-    if(silencedThisNight.length) publicMsg += "<br><br><span style='color:var(--warning)'>ผู้ที่ถูกเนรเทศงดออกเสียง:</span><br>" + silencedThisNight.join("<br>");
-    let secretMsg = secretLogs.length ? secretLogs.map(l => `<li>${l}</li>`).join("") : "<li>ไม่มีเหตุการณ์พิเศษ</li>";
+    // ================= 🍺 Drunk Awakening Logic =================
+    let drunkAlertMsg = null;
+    if (dayCount - 1 === 2) { 
+        players.forEach(p => {
+            if (p.role === 'drunk' && p.alive) {
+                const drunkRoles = ['vampire', 'hunter', 'wolf', 'villager', 'seer', 'bodyguard', 'hunter']; 
+                let newRole = drunkRoles[Math.floor(Math.random() * drunkRoles.length)];
+                
+                // 🛡️ Anti-Instant Win Check
+                if (newRole === 'wolf' || newRole === 'vampire') {
+                    let aliveCount = players.filter(aliveP => aliveP.alive).length;
+                    let evilCount = players.filter(aliveP => aliveP.alive && ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man','vampire'].includes(aliveP.role)).length + 1;
+                    if (evilCount >= Math.ceil(aliveCount / 2)) {
+                        newRole = 'hunter';
+                    }
+                }
+
+                p.role = newRole; 
+                drunkAlertMsg = `🍺 คนขี้เมา (<b style="color:var(--danger);">${p.name}</b>) สร่างเมาแล้ว!<br>บทบาทที่แท้จริงคือ: <b style="color:var(--warning);">${getRoleName(newRole)}</b>`;
+                secretLogs.push(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
+                addLog(`🍺 ${p.name} สร่างเมากลายเป็น ${getRoleName(newRole)}`);
+            }
+        });
+    }
+    
+    // ================= Prepare Morning Summary =================
+    let publicMsg = deadThisNight.length ? "💀 ผู้เสียชีวิตเมื่อคืน:<br>" + deadThisNight.join("<br>") : "🕊️ เมื่อคืนเป็นคืนที่สงบสุข ไม่มีผู้เสียชีวิต";
+    if(silencedThisNight.length) publicMsg += "<br><br><span style='color:var(--warning)'>🔇 ผู้ที่ถูกเนรเทศงดออกเสียง:</span><br>" + silencedThisNight.join("<br>");
+    let secretMsg = secretLogs.length ? secretLogs.map(l => `<li style="margin-bottom:5px;">${l}</li>`).join("") : "<li>ไม่มีเหตุการณ์พิเศษ</li>";
     
     document.getElementById("publicNightSummary").innerHTML = publicMsg;
     document.getElementById("secretNightSummary").innerHTML = secretMsg;
-    document.getElementById("nightSummaryModal").classList.add("active");
+    
+    if (drunkAlertMsg) {
+        showGmAlert(drunkAlertMsg, () => {
+            document.getElementById("nightSummaryModal").classList.add("active");
+        }, "🍺 คนขี้เมาสร่างแล้ว!");
+        try { hiccupAudio.currentTime = 0; hiccupAudio.play(); } catch(e){}
+    } else {
+        document.getElementById("nightSummaryModal").classList.add("active");
+    }
 }
 
 function checkDeathLinks(idx, isNight){
@@ -768,11 +835,13 @@ function resumeMorning() {
     }
 }
 
+// 🛠️ อัปเกรด: กรองรายชื่อลัทธิ (isCult) ออกจากเงื่อนไขการชนะของชาวบ้านและหมาป่า
 function checkWinCondition() {
     const alive = players.filter(p => p.alive); 
     const wolves = alive.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role));
     const vampires = alive.filter(p => p.role === 'vampire');
     
+    // ลัทธิชนะ (ทุกคนที่รอดคือลัทธิ)
     if(alive.length > 0 && alive.every(p => p.isCult)) { finishGame('cult', players.filter(p => p.isCult).map(p => p.name)); return true; }
     if(lastKilledByVote !== null && players[lastKilledByVote].role === 'jester' && !players[lastKilledByVote].isCult) { finishGame('jester', [players[lastKilledByVote].name]); return true; }
     
@@ -788,13 +857,14 @@ function checkWinCondition() {
     if(thugDone) {
         let winners = [players[thugIdx].name];
         if(wolvesWin) {
-            winners.push(...players.filter(p => ['wolf','wolf_cub','minion','hell_hound','wolf_man'].includes(p.role)).map(p => p.name));
+            winners.push(...players.filter(p => ['wolf','wolf_cub','minion','hell_hound','wolf_man'].includes(p.role) && !p.isCult).map(p => p.name));
             finishGame('thug', [...new Set(winners)], true); 
         } else if (vampireWin) {
             winners.push(...vampires.map(p => p.name));
             finishGame('thug', [...new Set(winners)], true);
         } else if(villagersWin) {
-            winners.push(...players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role)).map(p => p.name));
+            // ตัดคนที่เป็น isCult ออก ไม่ให้ชนะพร้อมชาวบ้าน
+            winners.push(...players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role) && !p.isCult).map(p => p.name));
             finishGame('thug', [...new Set(winners)], true); 
         } else {
             finishGame('thug', winners); 
@@ -804,16 +874,19 @@ function checkWinCondition() {
 
     if(wolvesWin) { 
         const lone = alive.find(p => p.role === 'lone_wolf');
-        if(lone && wolves.length === 1) { finishGame('lone_wolf', [lone.name]); return true; }
-        finishGame('wolf', players.filter(p => ['wolf','wolf_cub','hell_hound','minion','wolf_man'].includes(p.role)).map(p => p.name)); return true; 
+        if(lone && wolves.length === 1 && !lone.isCult) { finishGame('lone_wolf', [lone.name]); return true; }
+        // ตัดคนที่เป็น isCult ออก
+        finishGame('wolf', players.filter(p => ['wolf','wolf_cub','hell_hound','minion','wolf_man'].includes(p.role) && !p.isCult).map(p => p.name)); return true; 
     }
     if(villagersWin) { 
-        finishGame('village', players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role)).map(p => p.name)); return true; 
+        // ตัดคนที่เป็น isCult ออก
+        finishGame('village', players.filter(p => !['wolf','wolf_cub','hell_hound','lone_wolf','minion','jester','cult_leader','thug','wolf_man','vampire'].includes(p.role) && !p.isCult).map(p => p.name)); return true; 
     }
     return false;
 }
 
 function finishGame(type, winners, isCoWin = false) {
+    closeAllModals(); 
     try { bgmAudio.pause(); winAudio.play(); } catch(e){} const msg = getRandomWinMessage(type);
     document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("summaryScreen").classList.remove("hidden");
     document.getElementById("winTitle").innerText = msg.title + (isCoWin ? " (ชนะร่วม)" : "");
@@ -844,12 +917,12 @@ function renderGame() {
     }).join("") + `</div>`;
 }
 
-function copySummary() { let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n`; players.forEach((p, i) => { let status = (p.isCult ? ' 🪬' : '') + (p.silenced ? ' 🔇' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : ''); text += `${i+1}. ${p.name} ${status} : ${getRoleName(p.role)} (${p.alive ? 'รอด' : 'ตาย'})\n`; }); navigator.clipboard.writeText(text).then(() => alert("คัดลอกแล้ว!")); }
+function copySummary() { let text = `สรุปเกม: ${document.getElementById("winTitle").innerText}\n`; players.forEach((p, i) => { let status = (p.isCult ? ' 🪬' : '') + (p.silenced ? ' 🔇' : '') + (p.toughGuyBleeding ? ' 🩸' : '') + (lovers.includes(i) ? ' 💘' : '') + (thugTargets.includes(i) ? ' 👊' : '') + (hellHoundPartner === i || p.role === 'hell_hound' ? ' 🖤' : '') + (priestBlessedTarget === i ? ' ✞' : ''); text += `${i+1}. ${p.name} ${status} : ${getRoleName(p.role)} (${p.alive ? 'รอด' : 'ตาย'})\n`; }); navigator.clipboard.writeText(text).then(() => showGmAlert("คัดลอกลงคลิปบอร์ดเรียบร้อยแล้ว!")); }
 function resetToSetup(){ 
     if(currentGroup !== null) sessionStorage.setItem("reopenGroup", currentGroup);
     location.reload(); 
 }
-function endGameConfirm(){ if(confirm("จบเกม?")) resetToSetup(); }
+function endGameConfirm(){ showGmConfirm("ต้องการจบเกมและกลับสู่หน้าแรกใช่หรือไม่?", () => resetToSetup()); }
 function backToSetup(){ document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); }
 load();
 </script>
