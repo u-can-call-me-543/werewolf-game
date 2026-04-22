@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Werewolf GM v5.76 (Master Edition)</title>
+<title>Werewolf GM v5.76 (Master Edition - Secure)</title>
 
 <style>
 :root {
@@ -306,6 +306,14 @@ button.magic-btn { background: linear-gradient(135deg, #8b5cf6, #6d28d9); paddin
 </div>
 
 <script>
+// ================= 🛡️ XSS Security Feature ================= //
+// ป้องกันการใส่ HTML tag แปลกๆ ลงในชื่อ
+function cleanStr(str) {
+    if (!str) return "";
+    let d = new DOMParser().parseFromString(str, 'text/html');
+    return (d.body.textContent || "").trim();
+}
+
 // ================= 🚨 CUSTOM ALERT/CONFIRM LOGIC ================= //
 let gmAlertCallback = null;
 function showGmAlert(text, callback = null, title = "แจ้งเตือน") {
@@ -352,9 +360,33 @@ const reloadAudio = new Audio('reload.mp3'); const gunshotAudio = new Audio('gun
 bgmAudio.loop = true; bgmAudio.volume = 0.3; let isMuted = false;
 function toggleMute(){ isMuted = !isMuted; const icon = document.getElementById('bgmIcon'); if(isMuted){ bgmAudio.volume = 0; icon.innerText = "🔇"; } else { bgmAudio.volume = 0.3; icon.innerText = "🎵"; } }
 
+// 🛡️ ป้องกัน Audio Autoplay Block (ดักจับ Error Promise)
+function playAudio(audioObj, resetTime = true) {
+    if(!audioObj) return;
+    try {
+        if(resetTime) audioObj.currentTime = 0;
+        let p = audioObj.play();
+        if(p !== undefined) p.catch(e => {}); // ซ่อน Error ไม่ให้ขยะเต็ม Console
+    } catch(e){}
+}
+
 // ================= 🃏 Tarot Logic ================= //
-function shuffleDeck(id){ try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} const deck = document.getElementById(id); if (!deck) return; const topCard = deck.children[0]; if (!topCard) return; topCard.classList.add('shuffling'); setTimeout(() => { topCard.classList.remove('shuffling'); deck.appendChild(topCard); deck.children[0].classList.add('active'); }, 200); }
-function predictAll(){ const btn = document.getElementById('btnPredict'); if(btn.disabled) return; btn.disabled = true; btn.innerHTML = "กำลังสื่อสาร..."; try { shuffleAudio.currentTime = 0; shuffleAudio.play(); } catch(e){} const fastStyle = document.createElement("style"); fastStyle.innerText = `.tarot-card { transition: transform 0.1s !important; } .shuffling { transform: translateX(100px) rotate(15deg) !important; }`; document.head.appendChild(fastStyle); const endTime = Date.now() + 2000; function loop(){ ['deckVillage','deckWolf','deckSpecial'].forEach(id => { const deck = document.getElementById(id); if(!deck) return; const topCard = deck.children[0]; if(!topCard) return; topCard.classList.add('shuffling'); setTimeout(() => { topCard.classList.remove('shuffling'); deck.appendChild(deck.children[Math.floor(Math.random() * deck.children.length)]); deck.children[0].classList.add('active'); }, 80); }); if(Date.now() < endTime) { setTimeout(loop, 120); } else { document.head.removeChild(fastStyle); btn.disabled = false; btn.innerHTML = "ทำนาย"; try { shuffleAudio.pause(); shuffleAudio.currentTime = 0; } catch(e){} setTimeout(() => { try { cardAudio.currentTime = 0; cardAudio.play(); } catch(e){} }, 50); } } loop(); }
+function shuffleDeck(id){ 
+    const deck = document.getElementById(id); 
+    if (!deck || deck.dataset.locked === "true") return; // 🛡️ กันสแปมคลิก
+    deck.dataset.locked = "true";
+    playAudio(cardAudio); 
+    const topCard = deck.children[0]; 
+    if (!topCard) { deck.dataset.locked = "false"; return; } 
+    topCard.classList.add('shuffling'); 
+    setTimeout(() => { 
+        topCard.classList.remove('shuffling'); 
+        deck.appendChild(topCard); 
+        deck.children[0].classList.add('active'); 
+        deck.dataset.locked = "false";
+    }, 200); 
+}
+function predictAll(){ const btn = document.getElementById('btnPredict'); if(btn.disabled) return; btn.disabled = true; btn.innerHTML = "กำลังสื่อสาร..."; playAudio(shuffleAudio); const fastStyle = document.createElement("style"); fastStyle.innerText = `.tarot-card { transition: transform 0.1s !important; } .shuffling { transform: translateX(100px) rotate(15deg) !important; }`; document.head.appendChild(fastStyle); const endTime = Date.now() + 2000; function loop(){ ['deckVillage','deckWolf','deckSpecial'].forEach(id => { const deck = document.getElementById(id); if(!deck) return; const topCard = deck.children[0]; if(!topCard) return; topCard.classList.add('shuffling'); setTimeout(() => { topCard.classList.remove('shuffling'); deck.appendChild(deck.children[Math.floor(Math.random() * deck.children.length)]); deck.children[0].classList.add('active'); }, 80); }); if(Date.now() < endTime) { setTimeout(loop, 120); } else { document.head.removeChild(fastStyle); btn.disabled = false; btn.innerHTML = "ทำนาย"; try { shuffleAudio.pause(); shuffleAudio.currentTime = 0; } catch(e){} setTimeout(() => { playAudio(cardAudio); }, 50); } } loop(); }
 
 // ================= 🏆 Win Dialogues ================= //
 const winMessages = {
@@ -388,18 +420,27 @@ const roleBalanceValues = { villager: 1, seer: 7, witch: 3, cupid: -3, bodyguard
 function save(){ localStorage.setItem("groups_v5", JSON.stringify(groups)); }
 
 function load(){ 
-    groups = JSON.parse(localStorage.getItem("groups_v5") || "[]"); 
-    renderGroups(); 
-    let reopen = sessionStorage.getItem("reopenGroup");
-    if(reopen !== null && groups[parseInt(reopen)]) {
-        sessionStorage.removeItem("reopenGroup");
-        openGroup(parseInt(reopen));
+    try {
+        groups = JSON.parse(localStorage.getItem("groups_v5")) || []; 
+    } catch(e) {
+        groups = []; // 🛡️ กันโหลดเซฟพัง
     }
+    renderGroups(); 
+    try {
+        let reopen = sessionStorage.getItem("reopenGroup");
+        if(reopen !== null) {
+            let idx = parseInt(reopen, 10);
+            if(Number.isInteger(idx) && idx >= 0 && groups[idx]) {
+                sessionStorage.removeItem("reopenGroup");
+                openGroup(idx);
+            }
+        }
+    } catch(e) {}
 }
 
 function addLog(msg, isHeader = false){ const time = new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}); const logMsg = isHeader ? `<div class="log-header">${msg}</div>` : `<div>[${time}] ${msg}</div>`; gameLogs.push(logMsg); document.getElementById("gameLog").innerHTML = [...gameLogs].reverse().join(""); }
 function calculateBalance() { let score = 0; players.forEach(p => score += roleBalanceValues[p.role] || 0); document.getElementById("totalBalanceScore").innerText = score > 0 ? "+" + score : score; }
-function createGroup(){ const name = groupName.value; if(!name) return; groups.push({name: name, players: []}); save(); renderGroups(); groupName.value = ""; }
+function createGroup(){ const name = cleanStr(groupName.value); if(!name) return; groups.push({name: name, players: []}); save(); renderGroups(); groupName.value = ""; }
 function createTestGroup() { const testPlayers = Object.keys(roleNameTH).slice(0,23).map(roleKey => ({ name: roleNameTH[roleKey].split(" ")[1], role: roleKey, alive: true, isCult: false, silenced: false, toughGuyBleeding: false })); groups.push({name: "ห้องทดสอบแบบเต็ม", players: testPlayers}); save(); renderGroups(); }
 function deleteGroup(i) { showGmConfirm(`คุณต้องการลบกลุ่ม "${groups[i].name}" ใช่หรือไม่?`, () => { groups.splice(i, 1); save(); renderGroups(); }); }
 
@@ -414,10 +455,20 @@ function renderGroups(){
 function openGroup(i){ currentGroup = i; players = JSON.parse(JSON.stringify(groups[i].players || [])); document.getElementById("groupScreen").classList.add("hidden"); document.getElementById("setupScreen").classList.remove("hidden"); renderSetup(); }
 function backToGroup(){ groups[currentGroup].players = players; save(); document.getElementById("setupScreen").classList.add("hidden"); document.getElementById("groupScreen").classList.remove("hidden"); }
 
-// ================= 🛠️ Auto-Rename Feature =================
-function addPlayer(){ players.push({name:"ผู้เล่น "+(players.length+1), role:"villager", alive:true, isCult:false, silenced:false, toughGuyBleeding:false}); renderSetup(); }
+function addPlayer(){ 
+    players.push({
+        name: "ผู้เล่น " + (players.length + 1), 
+        role: "villager", 
+        alive: true, 
+        isCult: false, 
+        silenced: false, 
+        toughGuyBleeding: false
+    }); 
+    renderSetup(); 
+}
 function removePlayer(i){ players.splice(i, 1); renderSetup(); }
 
+// 🛠️ Auto-Rename Feature (เปลี่ยนชื่อตามบทบาทให้อัตโนมัติ)
 function handleRoleChange(index, newRole) { 
     if (uniqueRoles.includes(newRole) && players.some((p, i) => i !== index && p.role === newRole)) { 
         showGmAlert(`บทบาท ${getRoleName(newRole)} มีได้เพียงคนเดียว!`); 
@@ -446,7 +497,7 @@ function renderSetup(){
     setupPlayers.innerHTML = players.map((p, i) => `
         <div class="game-card" style="grid-template-columns: 25px 1fr 1fr auto;"> 
             <b style="color:var(--primary)">${i+1}</b> 
-            <input value="${p.name}" onchange="players[${i}].name=this.value"> 
+            <input value="${p.name}" onchange="players[${i}].name=cleanStr(this.value); renderSetup();"> 
             <select onchange="handleRoleChange(${i}, this.value)"> 
                 <optgroup label="ชาวบ้าน">${['villager','seer','witch','bodyguard','cupid','pacifist','fool','prince','hunter','priest','sick','mason','tough_guy','elder','wolf_human'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${getRoleName(k)}</option>`).join("")}</optgroup> 
                 <optgroup label="หมาป่า">${['wolf','wolf_cub','minion','hell_hound','wolf_man'].map(k=>`<option value="${k}" ${p.role===k?"selected":""}>${getRoleName(k)}</option>`).join("")}</optgroup> 
@@ -462,7 +513,6 @@ function togglePrivacy() { isPrivacyMode = !isPrivacyMode; document.getElementBy
 function startGame(){
     if(players.length < 3){ showGmAlert("ต้องการผู้เล่นอย่างน้อย 3 คน"); return; }
     
-    // --- บันทึกรายชื่อและบทบาทลงฐานข้อมูลก่อนเริ่มเกม ---
     if(currentGroup !== null) {
         groups[currentGroup].players = JSON.parse(JSON.stringify(players));
         save();
@@ -474,7 +524,7 @@ function startGame(){
     priestBlessedTarget = null; priestSetupDone = false; wolvesSick = false; pendingHunters = []; masonCheckDone = false; thugSetupDone = false; makeWolvesSickNextNight = false; deadThisVote = [];
 
     addLog("--- เริ่มต้นเกม ---"); addLog(`เช้าวันที่ ${dayCount}`, true);
-    try { bgmAudio.currentTime = 0; bgmAudio.play(); } catch(e){} document.getElementById('floatingAudio').classList.remove('hidden');
+    playAudio(bgmAudio); document.getElementById('floatingAudio').classList.remove('hidden');
     document.getElementById("setupScreen").classList.add("hidden"); document.getElementById("gameScreen").classList.remove("hidden");
     runInitialPhases();
 }
@@ -496,7 +546,7 @@ function renderMinionCheck() { const wolves = players.filter(p => ['wolf','wolf_
 function renderMasonCheck() { const masons = players.filter(p => p.role === 'mason').map(p => p.name); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'ภราดรแห่งเมสัน' : 'Masons'}: ลืมตาเพื่อยืนยันตัวตน</div><p style="text-align:center; font-size:20px; color:var(--success); font-weight:bold;">${masons.join(", ") || 'ไม่มี'}</p><button class="primary" style="width:100%; margin-top:20px;" onclick="masonCheckDone=true; runInitialPhases()">รับทราบและถัดไป</button></div>`; }
 function toggleLover(index) { if (lovers.includes(index)) { lovers = lovers.filter(x => x !== index); } else if (lovers.length < 2) { lovers.push(index); } renderCupid(); }
 function renderCupid(){ let btns = players.map((p,i) => `<button class="ghost" style="${lovers.includes(i) ? 'background: var(--lovers-pink); color: white; border: 2px solid white;' : ''}" onclick="toggleLover(${i})">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'กามเทพ' : 'Cupid'}: เลือกคู่รัก 2 คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px; background:var(--lovers-pink);" onclick="if(lovers.length==2) runInitialPhases()">ยืนยันเป้าหมาย</button></div>`; }
-function renderPriestSelect(){ let btns = players.map((p,i) => p.role === 'priest' ? '' : `<button class="ghost" style="${priestBlessedTarget === i ? 'background: var(--warning); color: black; border: 2px solid white;' : ''}" onclick="priestBlessedTarget=${i}; renderPriestSelect();">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'นักบวช' : 'Priest'}: เลือกมอบพรคุ้มครองการโหวตให้ 1 คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px;" onclick="priestSetupDone=true; try{ blessAudio.currentTime = 0; blessAudio.play(); }catch(e){}; runInitialPhases()">${currentLang === 'TH' ? 'ยืนยันเป้าหมาย' : 'Confirm'}</button></div>`; }
+function renderPriestSelect(){ let btns = players.map((p,i) => p.role === 'priest' ? '' : `<button class="ghost" style="${priestBlessedTarget === i ? 'background: var(--warning); color: black; border: 2px solid white;' : ''}" onclick="priestBlessedTarget=${i}; renderPriestSelect();">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'นักบวช' : 'Priest'}: เลือกมอบพรคุ้มครองการโหวตให้ 1 คน</div><div class="game-grid">${btns}</div><button class="primary" style="width:100%; margin-top:20px;" onclick="priestSetupDone=true; playAudio(blessAudio); runInitialPhases()">${currentLang === 'TH' ? 'ยืนยันเป้าหมาย' : 'Confirm'}</button></div>`; }
 function toggleThugTarget(index, max) { if (thugTargets.includes(index)) { thugTargets = thugTargets.filter(x => x !== index); } else if (thugTargets.length < max) { thugTargets.push(index); } renderThugSelect(); }
 function renderThugSelect(){ 
     const max = players.filter(p => ['wolf','wolf_cub','hell_hound','lone_wolf','wolf_man'].includes(p.role)).length; 
@@ -506,23 +556,33 @@ function renderThugSelect(){
 function renderHellHoundSelect(){ let btns = players.map((p,i) => p.role === 'hell_hound' ? '' : `<button class="ghost" style="${hellHoundPartner === i ? 'background: var(--danger); color: white; border: 2px solid white;' : ''}" onclick="hellHoundPartner=${i}; renderHellHoundSelect();">${p.name}</button>`).join(""); gamePlayers.innerHTML = `<div class="glass-panel"><div class="gm-script">${currentLang === 'TH' ? 'หมาป่าโลกันตร์' : 'Hell Hound'}: เลือกคู่ชีวิตลับ</div><div class="game-grid">${btns}</div><button class="danger" style="width:100%; margin-top:20px; color:white;" onclick="if(hellHoundPartner!==null) runInitialPhases()">ยืนยันเป้าหมาย</button></div>`; }
 
 function startCustomTimer() {
-    if(document.activeElement) document.activeElement.blur(); const minVal = document.getElementById('timerMins').value; const secVal = document.getElementById('timerSecs').value; let t = (parseInt(minVal) || 0) * 60 + (parseInt(secVal) || 0);
+    if(document.activeElement) document.activeElement.blur(); 
+    const minVal = document.getElementById('timerMins').value; 
+    const secVal = document.getElementById('timerSecs').value; 
+    let t = (parseInt(minVal, 10) || 0) * 60 + (parseInt(secVal, 10) || 0); // 🛡️ กัน Error ฐานตัวเลข
     if(t <= 0) { showGmAlert("⚠️ กรุณาระบุเวลาให้ถูกต้องก่อนเริ่มจับเวลาครับ"); document.getElementById('timerMins').value = 3; return; }
-    if(!isPrivacyMode) togglePrivacy(); document.getElementById('fullScreenTimer').classList.add('active'); clearInterval(timerInterval); timeRemaining = t; updateTimerDisp(); try { alarmAudio.play().then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; }).catch(e => {}); } catch(e){}
-    timerInterval = setInterval(() => { timeRemaining--; if(timeRemaining <= 0) { clearInterval(timerInterval); try { alarmAudio.play(); } catch(e){} } updateTimerDisp(); }, 1000);
+    
+    if(!isPrivacyMode) togglePrivacy(); 
+    document.getElementById('fullScreenTimer').classList.add('active'); 
+    
+    if(timerInterval) clearInterval(timerInterval); // 🛡️ กันเวลารันซ้อนทับกัน
+    
+    timeRemaining = t; updateTimerDisp(); 
+    try{ let p = alarmAudio.play(); if(p!==undefined) p.then(()=>alarmAudio.pause()).catch(e=>{}); }catch(e){}
+    
+    timerInterval = setInterval(() => { timeRemaining--; if(timeRemaining <= 0) { clearInterval(timerInterval); playAudio(alarmAudio, false); } updateTimerDisp(); }, 1000);
 }
 function stopCustomTimer() { clearInterval(timerInterval); document.getElementById('fullScreenTimer').classList.remove('active'); try { alarmAudio.pause(); alarmAudio.currentTime = 0; } catch(e){} }
 function updateTimerDisp() { const m = Math.floor(Math.max(timeRemaining, 0) / 60).toString().padStart(2,'0'); const s = (Math.max(timeRemaining, 0) % 60).toString().padStart(2,'0'); document.getElementById("massiveTimerDisplay").innerText = `${m}:${s}`; document.getElementById("massiveTimerDisplay").style.color = timeRemaining <= 0 ? "var(--danger)" : "white"; }
 
-function nominate(i) { nominatedPlayer = i; document.getElementById("trialPlayerName").innerText = players[i].name; document.getElementById("trialModal").classList.add("active"); }
+function nominate(i) { nominatedPlayer = i; document.getElementById("trialPlayerName").innerHTML = players[i].name; document.getElementById("trialModal").classList.add("active"); }
 function closeTrial() { document.getElementById("trialModal").classList.remove("active"); }
 
 function verdict(isGuilty) {
     if(!isGuilty) { addLog(`${players[nominatedPlayer].name} ได้รับการปล่อยตัว`); closeTrial(); renderGame(); return; }
     const i = nominatedPlayer; deadThisVote = []; 
     
-    // 🎧 เสียงเคาะบัลลังก์ศาล ป๊อกๆ
-    try { gavelAudio.currentTime = 0; gavelAudio.play(); } catch(e){} 
+    playAudio(gavelAudio); 
 
     // 🛠️ แก้บั๊กหน้าต่างโหวตค้าง: ปิด Modal ก่อนโชว์ Alert
     if(priestBlessedTarget === i) {
@@ -573,10 +633,10 @@ function processPendingHunters(callback) {
     if (pendingHunters.length === 0) { document.getElementById("hunterModal").classList.remove("active"); if (hunterCallback) hunterCallback(); return; }
     
     currentHunterIndex = pendingHunters.shift(); selectedHunterTarget = null;
-    document.getElementById("hunterShooterName").innerText = players[currentHunterIndex].name;
+    document.getElementById("hunterShooterName").innerHTML = players[currentHunterIndex].name;
     updateHunterModalUI();
     document.getElementById("hunterModal").classList.add("active");
-    try { reloadAudio.currentTime = 0; reloadAudio.play(); } catch(e){} // 🎧 เสียงชักปืน
+    playAudio(reloadAudio); 
 }
 function updateHunterModalUI() {
     let html = players.map((p, i) => {
@@ -592,7 +652,7 @@ function fireHunterShot() {
     // ปิดหน้าต่างนายพรานทันที เพื่อป้องกันกดซ้ำ
     document.getElementById("hunterModal").classList.remove("active"); 
 
-    try { gunshotAudio.currentTime = 0; gunshotAudio.play(); } catch(e){} // 🎧 เสียงยิงปืน
+    playAudio(gunshotAudio); 
     let t = selectedHunterTarget;
     players[t].alive = false;
     addLog(`🏹 ${players[currentHunterIndex].name} ยิง ${players[t].name} ตายตามไป!`);
@@ -611,7 +671,7 @@ function fireHunterShot() {
 }
 
 function startNight() { 
-    try { wolfAudio.play(); } catch(e){} stopCustomTimer(); document.getElementById("dayTimerPanel").classList.add("hidden"); document.getElementById("btnStartNight").classList.add("hidden");
+    playAudio(wolfAudio, false); stopCustomTimer(); document.getElementById("dayTimerPanel").classList.add("hidden"); document.getElementById("btnStartNight").classList.add("hidden");
     deadThisNight = []; silencedThisNight = []; secretLogs = []; deadThisVote = []; dayCount++; addLog(`คืนวันที่ ${dayCount - 1}`, true); nightStep = 0; nightKillTargets = []; nightGuardTarget = null; elderSilenceTarget = null; cultRecruits = []; lastKilledByVote = null; makeWolvesSickNextNight = false;
     
     witchAction = null; witchPoisonTarget = null; vampireKillTarget = null;
@@ -800,7 +860,7 @@ function resolveNight() {
         showGmAlert(drunkAlertMsg, () => {
             document.getElementById("nightSummaryModal").classList.add("active");
         }, "🍺 คนขี้เมาสร่างแล้ว!");
-        try { hiccupAudio.currentTime = 0; hiccupAudio.play(); } catch(e){}
+        playAudio(hiccupAudio);
     } else {
         document.getElementById("nightSummaryModal").classList.add("active");
     }
@@ -812,7 +872,7 @@ function checkDeathLinks(idx, isNight){
 }
 
 function closeNightSummary() { 
-    try { morningAudio.play(); } catch(e){} 
+    playAudio(morningAudio, false);
     document.getElementById("nightSummaryModal").classList.remove("active"); 
     addLog(`เช้าวันที่ ${dayCount}`, true); 
     
@@ -887,7 +947,9 @@ function checkWinCondition() {
 
 function finishGame(type, winners, isCoWin = false) {
     closeAllModals(); 
-    try { bgmAudio.pause(); winAudio.play(); } catch(e){} const msg = getRandomWinMessage(type);
+    try { bgmAudio.pause(); } catch(e){} 
+    playAudio(winAudio, false); 
+    const msg = getRandomWinMessage(type);
     document.getElementById("gameScreen").classList.add("hidden"); document.getElementById("summaryScreen").classList.remove("hidden");
     document.getElementById("winTitle").innerText = msg.title + (isCoWin ? " (ชนะร่วม)" : "");
     document.getElementById("winDesc").innerText = msg.desc;
